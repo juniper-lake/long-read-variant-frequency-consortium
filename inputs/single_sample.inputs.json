@@ -1,0 +1,30 @@
+{
+    "sample": {
+        "name": "HG002",
+        "smrtcells": [
+            {
+            "name": "m64012_190920_173625",
+            "path": "pb-human-wgs-workflow-test-datasets/HG002/m64012_190920_173625.ccs.bam",
+            "isUbam": true
+            },
+            {
+            "name": "m64012_190921_234837.ccs.bam",
+            "path": "pb-human-wgs-workflow-test-datasets/HG002/m64012_190921_234837.ccs.bam",
+            "isUbam": true
+            },
+            {
+            "name": "m64015_190920_185703.ccs.bam",
+            "path": "pb-human-wgs-workflow-test-datasets/HG002/m64015_190920_185703.ccs.bam",
+            "isUbam": true
+            }
+        ]
+    },
+    "reference": {
+        "name": "GRCh38", 
+        "data": "reference/human_GRCh38_no_alt_analysis_set.fasta", 
+        "index": "reference/human_GRCh38_no_alt_analysis_set.fasta.fai"
+    },
+    "regions": ["chr2"],
+    "tr_bed": "reference/human_GRCh38_no_alt_analysis_set.trf.bed",
+    "conda_image": "jlake/docker-lrvfc:latest"
+}

@@ -2,8 +2,8 @@ version 1.0
 
 struct IndexedData {
   String name
-  File dataFile
-  File indexFile
+  File data
+  File index
 }
 
 struct SmrtcellInfo {

@@ -9,7 +9,7 @@ struct IndexedData {
 struct SmrtcellInfo {
   String name
   File path
-  Boolean isUbam
+  Boolean is_ubam
 }
 
 struct SampleInfo {

@@ -5,17 +5,17 @@
             {
             "name": "m64012_190920_173625",
             "path": "pb-human-wgs-workflow-test-datasets/HG002/m64012_190920_173625.ccs.bam",
-            "isUbam": true
+            "is_ubam": true
             },
             {
             "name": "m64012_190921_234837.ccs.bam",
             "path": "pb-human-wgs-workflow-test-datasets/HG002/m64012_190921_234837.ccs.bam",
-            "isUbam": true
+            "is_ubam": true
             },
             {
             "name": "m64015_190920_185703.ccs.bam",
             "path": "pb-human-wgs-workflow-test-datasets/HG002/m64015_190920_185703.ccs.bam",
-            "isUbam": true
+            "is_ubam": true
             }
         ]
     },

@@ -30,9 +30,9 @@ task build_movie_info {
 
   output {
     MovieInfo movie = object {
-      "name": movie_name,
-      "path": movie_path,
-      "is_ubam": is_ubam
+      name: movie_name,
+      path: movie_path,
+      is_ubam: is_ubam
     }
   }
 

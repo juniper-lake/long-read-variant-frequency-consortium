@@ -15,7 +15,7 @@ task get_reference{
     conda_image: "Docker image with necessary conda environments installed."
 
     # outputs
-    sample: "A IndexedData object."
+    reference: "A IndexedData object."
   }
 
   input {

@@ -73,8 +73,8 @@ task build_sample_info {
 
   output {
     SampleInfo sample = object {
-      "name": sample_name,
-      "movies": movies,
+      name: sample_name,
+      movies: movies,
     }
   }
 

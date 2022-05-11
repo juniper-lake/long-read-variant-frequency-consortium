@@ -1,12 +1,10 @@
 {
     "sample_name": "HG002",
     "sample_sheet": "sample_sheet.tsv",
-    "reference": {
-        "name": "GRCh38", 
-        "data": "reference/human_GRCh38_no_alt_analysis_set.fasta", 
-        "index": "reference/human_GRCh38_no_alt_analysis_set.fasta.fai"
-    },
+    "reference_name": "GRCh38", 
+    "reference_fasta": "reference/human_GRCh38_no_alt_analysis_set.fasta", 
+    "reference_index": "reference/human_GRCh38_no_alt_analysis_set.fasta.fai",
     "regions": ["chr2"],
     "tr_bed": "reference/human_GRCh38_no_alt_analysis_set.trf.bed",
-    "conda_image": "jlake/docker-lrvfc:latest"
+    "conda_image": "juniperlake/lrvfc_testing:latest"
 }

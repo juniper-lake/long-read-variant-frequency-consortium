@@ -3,10 +3,20 @@ version 1.0
 import "structs.wdl"
 
 task split_data_from_index {
+  meta {
+    description: "This task will split the data and index files from an IndexedData object."
+  }
+
+  parameter_meta {
+    indexedData: "IndexedData object to split."
+    threads: "Number of threads to use."
+  }
+
   input {
     IndexedData indexedData
 
     Int threads = 1
+    String conda_image
   }
 
   command {
@@ -18,20 +28,11 @@ task split_data_from_index {
   }
 
   runtime {
-    docker: 'ubuntu:18.04'
+    docker: conda_image
     preemptible: 1
     maxRetries: 3
     memory: "4GB"
     cpu: threads
-  }
-
-  meta {
-    description: "This task will split the data and index files from an IndexedData object."
-  }
-
-  parameter_meta {
-    indexedData: "IndexedData object to split."
-    threads: "Number of threads to use."
   }
 }
 

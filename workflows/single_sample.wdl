@@ -1,25 +1,35 @@
 version 1.0
 
 import "tasks/structs.wdl"
+import "tasks/sample_info.wdl" as sample_info
 import "tasks/pbmm2.wdl" as pbmm2
 import "tasks/pbsv.wdl" as pbsv
 
 workflow do_all_the_things {
   input {
-    SampleInfo sample
+    String sample_name
+    File sample_sheet
     IndexedData reference
     File tr_bed
     Array[String] regions
     String conda_image
   }
 
+  # get sample info, such as hifi reads files, from sample sheet
+  call sample_info.get_sample_info {
+    input:
+      sample_name = sample_name,
+      sample_sheet = sample_sheet,
+      conda_image = conda_image
+  }
+
   # align all hifi reads associated with sample to reference
-  scatter (smrtcell in sample.smrtcells) { 
+  scatter (movie in get_sample_info.sample.movies) { 
     call pbmm2.align_ubam_or_fastq {
         input: 
           reference = reference,
-          smrtcell = smrtcell,
-          sample_name = sample.name,
+          movie = movie,
+          sample_name = get_sample_info.sample.name,
           conda_image = conda_image
     }
   }
@@ -27,7 +37,7 @@ workflow do_all_the_things {
   # run pbsv on single sample
   call pbsv.run_pbsv {
       input: 
-        name = sample.name,
+        name = get_sample_info.sample.name,
         reference = reference,
         aligned_bams = align_ubam_or_fastq.aligned_bam,
         tr_bed = tr_bed,

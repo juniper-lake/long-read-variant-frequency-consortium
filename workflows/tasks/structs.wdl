@@ -6,7 +6,7 @@ struct IndexedData {
   File index
 }
 
-struct SmrtcellInfo {
+struct MovieInfo {
   String name
   File path
   Boolean is_ubam
@@ -14,5 +14,10 @@ struct SmrtcellInfo {
 
 struct SampleInfo {
   String name
-  Array[SmrtcellInfo] smrtcells
+  Array[MovieInfo] movies
+}
+
+struct CohortInfo {
+  String name
+  Array[SampleInfo] samples
 }

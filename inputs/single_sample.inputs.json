@@ -1,24 +1,6 @@
 {
-    "sample": {
-        "name": "HG002",
-        "smrtcells": [
-            {
-            "name": "m64012_190920_173625",
-            "path": "pb-human-wgs-workflow-test-datasets/HG002/m64012_190920_173625.ccs.bam",
-            "is_ubam": true
-            },
-            {
-            "name": "m64012_190921_234837.ccs.bam",
-            "path": "pb-human-wgs-workflow-test-datasets/HG002/m64012_190921_234837.ccs.bam",
-            "is_ubam": true
-            },
-            {
-            "name": "m64015_190920_185703.ccs.bam",
-            "path": "pb-human-wgs-workflow-test-datasets/HG002/m64015_190920_185703.ccs.bam",
-            "is_ubam": true
-            }
-        ]
-    },
+    "sample_name": "HG002",
+    "sample_sheet": "sample_sheet.tsv",
     "reference": {
         "name": "GRCh38", 
         "data": "reference/human_GRCh38_no_alt_analysis_set.fasta", 

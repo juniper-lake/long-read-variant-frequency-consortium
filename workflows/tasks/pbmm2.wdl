@@ -5,13 +5,12 @@ import "structs.wdl"
 task align_ubam_or_fastq {
   meta {
     description: "This task will align HiFi reads from either a BAM or FASTQ file."
-    author: "Juniper Lake"
   }
 
   parameter_meta {
     # inputs
     reference: "Dictionary describing reference genome containing 'name': STR, 'data': STR, and 'index': STR."
-    smrtcell: "Dictionary of unaligned HiFi reads containing 'name': STR , 'path': STR, and 'isUbam': BOOL."
+    movie: "Dictionary of unaligned HiFi reads containing 'name': STR , 'path': STR, and 'isUbam': BOOL."
     sample_name: "Name of the sample."
     preset_option: "This option applies multiple options at the same time."
     log_level: "Log level of pbmm2."
@@ -28,7 +27,7 @@ task align_ubam_or_fastq {
 
   input {
     IndexedData reference
-    SmrtcellInfo smrtcell
+    MovieInfo movie
     String sample_name
 
     String preset_option = "CCS"
@@ -36,14 +35,14 @@ task align_ubam_or_fastq {
     String extra = "-c 0 -y 70"
     Boolean unmapped = true
     Boolean sort = true
-    String output_filename = "~{smrtcell.name}.~{reference.name}.bam"
+    String output_filename = "~{movie.name}.~{reference.name}.bam"
     
     Int threads = 24
     String conda_image
     }
 
   Float multiplier = 2.5
-  Int disk_size = ceil(multiplier * (size(reference.data, "GB") + size(reference.index, "GB") + size(smrtcell.path, "GB"))) + 20
+  Int disk_size = ceil(multiplier * (size(reference.data, "GB") + size(reference.index, "GB") + size(movie.path, "GB"))) + 20
   
   command {
     set -o pipefail
@@ -59,13 +58,13 @@ task align_ubam_or_fastq {
       ~{extra} \
       -j ~{threads} \
       ~{reference.data} \
-      ~{smrtcell.path} \
+      ~{movie.path} \
       ~{output_filename}
     }
 
   output {
     IndexedData aligned_bam = {
-      "name": smrtcell.name, 
+      "name": movie.name, 
       "data": output_filename, 
       "index": "~{output_filename}.bai"
       }

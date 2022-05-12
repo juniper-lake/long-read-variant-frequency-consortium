@@ -23,6 +23,8 @@ task align_ubam_or_fastq {
 
     # outputs
     aligned_bam: { description: "An IndexedData object with aligned HiFi reads and index." }
+    aligned_bam_file: { description: "Aligned bam file." }
+    aligned_bam_index: { description: "Aligned bam index." }
   }
 
   input {
@@ -68,6 +70,8 @@ task align_ubam_or_fastq {
       "data": output_filename, 
       "index": "~{output_filename}.bai"
       }
+    File aligned_bam_file = output_filename
+    File aligned_bam_index = "~{output_filename}.bai"
   }
 
   runtime {

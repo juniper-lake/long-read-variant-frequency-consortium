@@ -55,7 +55,8 @@ workflow do_all_the_things {
   }
 
   output {
-    Array[IndexedData] aligned_bams = align_ubam_or_fastq.aligned_bam
+    Array[File] aligned_bam_files = align_ubam_or_fastq.aligned_bam_file
+    Array[File] aligned_bam_indexes = align_ubam_or_fastq.aligned_bam_index
     Array[Array[File]] svsigs = run_pbsv.svsigs
     File pbsv_vcf = run_pbsv.pbsv_vcf
     Array[File] pbsv_region_vcfs = run_pbsv.pbsv_region_vcfs

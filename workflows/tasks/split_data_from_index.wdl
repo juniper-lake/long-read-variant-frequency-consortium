@@ -2,56 +2,71 @@ version 1.0
 
 import "structs.wdl"
 
+
+workflow split_data_from_index_array {
+  meta {
+    description: "Splits IndexedData objects into data and index for all items in an array."
+  }
+
+  parameter_meta {
+    # inputs
+    indexed_data_array: { help: "The array of IndexedData objects to split." }
+
+    # outputs
+    data_files: { description: "Array of data files." }
+    index_files: { description: "Array of index files." }
+  }
+  
+  input {
+    Array[IndexedData] indexed_data_array
+  }
+
+  # for each IndexedData object in array, split data and index files
+  scatter (indexed_data in indexed_data_array) {
+    call split_data_from_index {
+      input:
+        indexed_data = indexed_data
+    }
+  }
+
+  output {
+    Array[File] data_files = split_data_from_index.data
+    Array[File] index_files = split_data_from_index.index
+  }
+}
+
+
 task split_data_from_index {
   meta {
     description: "This task will split the data and index files from an IndexedData object."
   }
 
   parameter_meta {
-    indexedData: "IndexedData object to split."
-    threads: "Number of threads to use."
+    # inputs
+    indexedData: { help: "IndexedData object to split." }
+
+    # outputs
+    data: { description: "Data file." }
+    index: { description: "Index file." }
   }
 
   input {
-    IndexedData indexedData
-
-    Int threads = 1
-    String conda_image
+    IndexedData indexed_data
   }
 
   command {
   }
 
   output {
-    File dataFile = indexedData.dataFile
-    File indexFile = indexedData.indexFile
+    File data = indexedData.data
+    File index = indexedData.index
   }
 
   runtime {
-    docker: conda_image
+    docker: "ubuntu:latest"
     preemptible: 1
     maxRetries: 3
-    memory: "4GB"
-    cpu: threads
   }
 }
 
 
-workflow split_data_from_index_array {
-  input {
-    Array[IndexedData] indexedDataArray
-  }
-
-  # for each IndexedData object in array, split data and index files
-  scatter (indexedData in indexedDataArray) {
-    call split_data_from_index {
-      input:
-        indexedData = indexedData
-    }
-  }
-
-  output {
-    Array[File] dataFiles = split_data_from_index.dataFile
-    Array[File] indexFiles = split_data_from_index.indexFile
-  }
-}

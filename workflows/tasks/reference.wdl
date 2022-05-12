@@ -9,10 +9,15 @@ task get_reference{
 
   parameter_meta {
     # inputs
-    reference_name: "Name of the reference."
-    reference_fasta: "Reference genome in FASTA format."
-    reference_index: "Reference genome index in FAI (.fasta.fai) format."
-    conda_image: "Docker image with necessary conda environments installed."
+    reference_name: { help: "Name of the reference." }
+    reference_fasta: { 
+      help: "Reference genome in FASTA format.",
+      patterns: ["*.fa", "*.fasta"] 
+    }
+    reference_index: { 
+      help: "Reference genome index in FAI (.fasta.fai) format.",
+      paterns: ["*.fa.fai", "*.fasta.fai"]
+    }
 
     # outputs
     reference: "A IndexedData object."
@@ -22,7 +27,6 @@ task get_reference{
     String reference_name
     File reference_fasta
     File reference_index
-    String conda_image
   }
   command {
   }
@@ -36,11 +40,8 @@ task get_reference{
   }
 
   runtime {
-    # cpu: threads
-    # memory: "GB"
-    # disks: "~{disk_size} GB"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "ubuntu:latest"
   }
 }

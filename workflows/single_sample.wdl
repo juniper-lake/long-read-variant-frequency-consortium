@@ -23,7 +23,6 @@ workflow do_all_the_things {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      conda_image = conda_image
   }
 
   # get sample info, such as hifi reads files, from sample sheet
@@ -31,7 +30,6 @@ workflow do_all_the_things {
     input:
       sample_name = sample_name,
       sample_sheet = sample_sheet,
-      conda_image = conda_image
   }
 
   # align all hifi reads associated with sample to reference
@@ -63,6 +61,4 @@ workflow do_all_the_things {
     Array[File] pbsv_region_vcfs = run_pbsv.pbsv_region_vcfs
     Array[File] pbsv_region_indexes = run_pbsv.pbsv_region_indexes
   }
-
-
 }

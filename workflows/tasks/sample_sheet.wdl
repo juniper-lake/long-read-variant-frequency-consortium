@@ -2,16 +2,66 @@ version 1.0
 
 import "structs.wdl"
 
-task get_lines {
+
+workflow get_sample_movies {
   meta {
-    description: "This task finds all movies associated with a sample in the sample sheet."
+    description: "Finds all movies associated with a sample in the sample sheet."
   }
 
   parameter_meta {
     # inputs
-    sample_name: "Name of the sample."
-    sample_sheet: "TSV with following columns (order matters), lines starting with # are ignored (e.g. header): [1] sample_name [2] cohort_name [3] movie_path [4] movie_name [5] is_ubam"
-    conda_image: "Docker image with necessary conda environments installed."
+    sample_name: { help: "Name of the sample." }
+    sample_sheet: { 
+      help: "TSV (.txt or .tsv) with following columns (order matters), lines starting with # are ignored (e.g. header): [1] sample_name [2] cohort_name [3] movie_path [4] movie_name [5] is_ubam",
+      patterns: ["*.txt", "*.tsv"]
+    }
+
+    # outputs
+    movie_names: { description: "Array of movie names." }
+    movie_paths: { description: "Array of movie paths." }
+    is_ubam: { description: "Array of boolean values indicating if the movie is a ubam." }
+  }
+
+  input {
+    String sample_name
+    File sample_sheet
+  }
+  
+  # turn sample sheet TSV into array of lines
+  call get_lines {
+    input: 
+      sample_name = sample_name,
+      sample_sheet = sample_sheet,
+  }
+  
+  # turn each line into variables
+  scatter (line in get_lines.lines) {
+    call split_line {
+      input:
+        line = line,
+    }        
+  }
+
+  output {
+    Array[String] movie_names = split_line.movie_name
+    Array[File] movie_paths = split_line.movie_path
+    Array[Boolean] is_ubams = split_line.is_ubam
+  }
+}
+
+
+task get_lines {
+  meta {
+    description: "Finds all movies associated with a sample in the sample sheet."
+  }
+
+  parameter_meta {
+    # inputs
+    sample_name: { help: "Name of the sample." }
+    sample_sheet: { 
+      help: "TSV (.txt or .tsv) with following columns (order matters), lines starting with # are ignored (e.g. header): [1] sample_name [2] cohort_name [3] movie_path [4] movie_name [5] is_ubam",
+      patterns: ["*.txt", "*.tsv"]
+    }
 
     # outputs
     lines: "Lines of the sample sheet associated with the sample."
@@ -20,7 +70,6 @@ task get_lines {
   input {
     String sample_name
     File sample_sheet
-    String conda_image
     }
   
   command {
@@ -33,12 +82,9 @@ task get_lines {
   }
 
   runtime {
-    # cpu: threads
-    memory: "1GB"
-    # disks: "~{disk_size} GB"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "ubuntu:latest"
   }
 }
 
@@ -50,8 +96,7 @@ task split_line {
 
   parameter_meta {
     # inputs
-    line: "Line from the sample sheet."
-    conda_image: "Docker image with necessary conda environments installed."
+    line: { help: "Line from the sample sheet." }
 
     # outputs
     movie_path: "Path to the movie."
@@ -61,7 +106,6 @@ task split_line {
 
   input {
     Array[String] line
-    String conda_image
     }
   
   command {
@@ -74,53 +118,10 @@ task split_line {
   }
 
   runtime {
-    # cpu: threads
-    # memory: "GB"
-    # disks: "~{disk_size} GB"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "ubuntu:latest"
   }
 }
 
 
-workflow get_sample_movies {
-  meta {
-    description: "Finds all movies associated with a sample in the sample sheet."
-  }
-
-  parameter_meta {
-    sample_name: "Name of the sample."
-    sample_sheet: "TSV with following columns (order matters), lines starting with # are ignored (e.g. header): [1] sample_name [2] cohort_name [3] movie_path [4] movie_name [5] is_ubam"
-    conda_image: "Docker image with necessary conda environments installed."
-  }
-
-  input {
-    String sample_name
-    File sample_sheet
-    String conda_image
-  }
-  
-  # turn sample sheet TSV into array of lines
-  call get_lines {
-    input: 
-      sample_name = sample_name,
-      sample_sheet = sample_sheet,
-      conda_image = conda_image
-  }
-  
-  # turn each line into variables
-  scatter (line in get_lines.lines) {
-    call split_line {
-      input:
-        line = line,
-        conda_image = conda_image
-    }        
-  }
-
-  output {
-    Array[String] movie_names = split_line.movie_name
-    Array[File] movie_paths = split_line.movie_path
-    Array[Boolean] is_ubams = split_line.is_ubam
-  }
-}

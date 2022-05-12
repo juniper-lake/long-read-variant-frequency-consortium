@@ -4,25 +4,25 @@ import "structs.wdl"
 
 task align_ubam_or_fastq {
   meta {
-    description: "This task will align HiFi reads from either a BAM or FASTQ file."
+    description: "Aligns HiFi reads to reference genome from either a BAM or FASTQ file."
   }
 
   parameter_meta {
     # inputs
-    reference: "Dictionary describing reference genome containing 'name': STR, 'data': STR, and 'index': STR."
-    movie: "Dictionary of unaligned HiFi reads containing 'name': STR , 'path': STR, and 'isUbam': BOOL."
-    sample_name: "Name of the sample."
-    preset_option: "This option applies multiple options at the same time."
-    log_level: "Log level of pbmm2."
-    extra: "Additional pbmm2 options."
-    unmapped: "If true, unmapped reads are added to the output BAM file."
-    sort: "If true, will sort the output bam file."
-    output_filename: "Name of the output bam file."
-    threads: "Number of threads to be used."
-    conda_image: "Docker image with necessary conda environments installed."
+    reference: { help: "An IndexedData object with information about the reference." }
+    movie: { help: "A MovieInfo object with information about the HiFi reads movie." }
+    sample_name: { help: "Name of the sample." }
+    preset_option: { help: "This option applies multiple options at the same time." }
+    log_level: { help: "Log level of pbmm2." }
+    extra: { help: "Additional pbmm2 options." }
+    unmapped: { help: "If true, unmapped reads are added to the output BAM file." }
+    sort: { help: "If true, will sort the output bam file." }
+    output_filename: { help: "Name of the output bam file." }
+    threads: { help: "Number of threads to be used." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
-    aligned_bam: "Dictionary containing 'name': STR, 'data': STR, and 'index': STR."
+    aligned_bam: { description: "An IndexedData object with aligned HiFi reads and index." }
   }
 
   input {
@@ -73,7 +73,7 @@ task align_ubam_or_fastq {
   runtime {
     cpu: threads
     memory: "96GB"
-    disks: "~{disk_size} GB"
+    disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
     docker: conda_image

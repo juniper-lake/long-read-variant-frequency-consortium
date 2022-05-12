@@ -3,6 +3,27 @@ version 1.0
 import "structs.wdl"
 
 task zip_and_index_vcf {
+  meta {
+    description: "Zips and indexes a vcf file."
+  }
+
+  parameter_meta {
+    # inputs
+    input_vcf: {
+      help: "VCF file to be gzipped and indexed.",
+      patterns: ["*.vcf"]
+    }
+    tabix_extra: { help: "Extra arguments for tabix." }
+    output_filename: { help: "Output filename." }
+    threads: { help: "Number of threads to use." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
+
+    # outputs
+    vcf: { description: "Gzipped and indexed VCF file." }
+    index: { description: "Tabix index file." }
+    indexed_vcf: { description: "Gzipped and VCF index in form of IndexedData object." }
+  }
+
   input {
     File input_vcf
 
@@ -27,7 +48,7 @@ task zip_and_index_vcf {
   output {
     File vcf = output_filename
     File index = "~{output_filename}.tbi"
-    IndexedData indexedData = {
+    IndexedData indexed_vcf = {
       "name": basename(input_vcf, '.vcf'),
       "data": vcf,
       "index": index,
@@ -37,21 +58,9 @@ task zip_and_index_vcf {
   runtime {
     cpu: threads
     memory: "16GB"
-    disks: "~{disk_size} GB"
+    disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
     docker: conda_image
-  }
-  
-  meta {
-    description: "This task will zip and index a vcf file."
-  }
-
-  parameter_meta {
-    input_vcf: "VCF file to be gzipped and indexed."
-    tabix_extra: "Extra arguments for tabix."
-    output_filename: "Output filename."
-    threads: "Number of threads to use."
-    conda_image: "Docker image with necessary conda environments installed."
   }
 }

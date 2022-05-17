@@ -6,5 +6,6 @@
     "reference_index": "reference/human_GRCh38_no_alt_analysis_set.fasta.fai",
     "regions": ["chr2"],
     "tr_bed": "reference/human_GRCh38_no_alt_analysis_set.trf.bed",
-    "conda_image": "juniperlake/lrvfc_testing:latest"
+    "conda_image": "juniperlake/lrvfc_testing:latest",
+    "deepvariant_image": "google/deepvariant:pichuan-cl445842347-10"
 }

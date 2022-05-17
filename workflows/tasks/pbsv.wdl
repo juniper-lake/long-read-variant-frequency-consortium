@@ -1,6 +1,5 @@
 version 1.0
 
-import "structs.wdl"
 import "pbsv_discover.wdl" as pbsv_discover
 import "common.wdl" as common
 
@@ -13,8 +12,11 @@ workflow run_pbsv {
   parameter_meta {
     # inputs
     name: { help: "Name of sample or sample set." }
-    aligned_bams: { help: "Aligned BAM files." }
-    reference: { help: "Dictionary describing reference genome containing 'name': STR, 'data': STR, and 'index': STR." }
+    aligned_bams: { help: "Array of aligned BAM files." }
+    aligned_bam_indexes: { help: "Array of aligned BAM index files." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats." }
     regions: { help: "List of chromosomes or other genomic regions in which to search for SVs." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
@@ -27,9 +29,12 @@ workflow run_pbsv {
   }
 
   input {
-    String name
-    Array[IndexedData] aligned_bams
-    IndexedData reference
+    String sample_name
+    Array[File] aligned_bams
+    Array[File] aligned_bam_indexes
+    String reference_name
+    File reference_fasta
+    File reference_index
     File tr_bed
     Array[String] regions
     String conda_image
@@ -41,20 +46,23 @@ workflow run_pbsv {
       input: 
         region = region,
         aligned_bams = aligned_bams,
-        reference_name = reference.name,
+        aligned_bam_indexes = aligned_bam_indexes,
+        reference_name = reference_name,
         tr_bed = tr_bed,
         conda_image = conda_image
     }
   }
   
   # for each region, call SVs from svsig files for that region
-  scatter (region_index in range(length(regions))) {
+  scatter (region_idx in range(length(regions))) {
     call pbsv_call_variants {
       input: 
-        entity_name = name,
-        svsigs = pbsv_discover_signatures_across_bams.svsigs[region_index],
-        reference = reference,
-        region = regions[region_index],
+        sample_name = sample_name,
+        svsigs = pbsv_discover_signatures_across_bams.svsigs[region_idx],
+        reference_name = reference_name,
+        reference_fasta = reference_fasta,
+        reference_index = reference_index,
+        region = regions[region_idx],
         conda_image = conda_image
     }    
 
@@ -68,8 +76,8 @@ workflow run_pbsv {
   # concatenate all region-specific VCFs into a single genome-wide VCF
   call concat_pbsv_vcfs {
     input: 
-      entity_name = name,
-      reference_name = reference.name,
+      sample_name = sample_name,
+      reference_name = reference_name,
       input_vcfs = zip_and_index_vcf.vcf,
       input_indexes = zip_and_index_vcf.index,
       conda_image = conda_image
@@ -98,9 +106,11 @@ task pbsv_call_variants {
 
   parameter_meta {
     # inputs
-    entity_name: { help: "Name of sample (if singleton) or group (if set of samples)." }
+    sample_name: { help: "Name of sample (if singleton) or group (if set of samples)." }
     svsigs: { help: "SV signature files to be used for calling SVs." }
-    reference: { help: "Dictionary describing reference genome containing 'name': STR, 'dataFile': STR, and 'indexFile': STR." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
     region: { help: "Region of the genome to call structural variants, e.g. chr1." }
     extra: { help: "Extra parameters to pass to pbsv." }
     log_level: { help: "Log level." }
@@ -113,21 +123,21 @@ task pbsv_call_variants {
   }
 
   input {
-    String entity_name
+    String sample_name
     Array[File] svsigs
-    IndexedData reference
+    String reference_name
+    File reference_fasta
+    File reference_index
     String region
-
     String extra = "--hifi -m 20"
     String log_level = "INFO"
-    String output_filename = "~{entity_name}.~{reference.name}.~{region}.pbsv.vcf"
-
+    String output_filename = "~{sample_name}.~{reference_name}.~{region}.pbsv.vcf"
     Int threads = 8
     String conda_image
   }
 
   Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * (size(svsigs, "GB") + size(reference.data, "GB"))) + 20
+  Int disk_size = ceil(multiplier * (size(svsigs, "GB") + size(reference_fasta, "GB"))) + 20
 
   command {
     set -o pipefail
@@ -137,7 +147,7 @@ task pbsv_call_variants {
     pbsv call ~{extra} \
       --log-level ~{log_level} \
       --num-threads ~{threads} \
-      ~{reference.data} \
+      ~{reference_fasta} \
       ~{sep=" " svsigs} \
       ~{output_filename}
   }
@@ -164,8 +174,8 @@ task concat_pbsv_vcfs {
 
   parameter_meta {
     #inputs
-    entity_name: { help: "Name of sample (if singleton) or group (if set of samples)." }
-    reference_name: { help: "Name of the reference genome." }
+    sample_name: { help: "Name of sample (if singleton) or group (if set of samples)." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
     input_vcfs: { help: "VCF files to be concatenated." }
     input_indexes: { help: "Index files for VCFs." }
     extra: { help: "Extra parameters to pass to bcftools." }
@@ -178,14 +188,12 @@ task concat_pbsv_vcfs {
   }
 
   input {
-    String entity_name
+    String sample_name
     String reference_name
     Array[File] input_vcfs
     Array[File] input_indexes
-
     String extra = "--allow-overlaps"
-    String output_filename = "~{entity_name}.~{reference_name}.pbsv.vcf"
-
+    String output_filename = "~{sample_name}.~{reference_name}.pbsv.vcf"
     Int threads = 4
     String conda_image
   }

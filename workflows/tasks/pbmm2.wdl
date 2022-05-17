@@ -1,16 +1,17 @@
 version 1.0
 
-import "structs.wdl"
-
-task align_ubam_or_fastq {
+task run_pbmm2 {
   meta {
     description: "Aligns HiFi reads to reference genome from either a BAM or FASTQ file."
   }
 
   parameter_meta {
     # inputs
-    reference: { help: "An IndexedData object with information about the reference." }
-    movie: { help: "A MovieInfo object with information about the HiFi reads movie." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
+    movie: { help: "An BAM or FASTQ file containing HiFi reads." }
+    movie_name: { help: "Name of the HiFi reads movie, used for file labeling." }
     sample_name: { help: "Name of the sample." }
     preset_option: { help: "This option applies multiple options at the same time." }
     log_level: { help: "Log level of pbmm2." }
@@ -22,35 +23,34 @@ task align_ubam_or_fastq {
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
-    aligned_bam: { description: "An IndexedData object with aligned HiFi reads and index." }
-    aligned_bam_file: { description: "Aligned bam file." }
+    aligned_bam: { description: "Aligned bam file." }
     aligned_bam_index: { description: "Aligned bam index." }
   }
 
   input {
-    IndexedData reference
-    MovieInfo movie
+    String reference_name
+    File reference_fasta
+    File reference_index
+    File movie
+    String movie_name
     String sample_name
-
     String preset_option = "CCS"
     String log_level = "INFO"
     String extra = "-c 0 -y 70"
     Boolean unmapped = true
     Boolean sort = true
-    String output_filename = "~{movie.name}.~{reference.name}.bam"
-    
+    String output_filename = "~{movie_name}.~{reference_name}.bam"
     Int threads = 24
     String conda_image
     }
 
   Float multiplier = 2.5
-  Int disk_size = ceil(multiplier * (size(reference.data, "GB") + size(reference.index, "GB") + size(movie.path, "GB"))) + 20
+  Int disk_size = ceil(multiplier * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movie, "GB"))) + 20
   
   command {
     set -o pipefail
     source ~/.bashrc
     conda activate pbmm2
-    conda info
     pbmm2 align \
       --sample ~{sample_name} \
       --log-level ~{log_level} \
@@ -59,18 +59,13 @@ task align_ubam_or_fastq {
       ~{true="--unmapped" false="" unmapped} \
       ~{extra} \
       -j ~{threads} \
-      ~{reference.data} \
-      ~{movie.path} \
+      ~{reference_fasta} \
+      ~{movie} \
       ~{output_filename}
     }
 
   output {
-    IndexedData aligned_bam = {
-      "name": movie.name, 
-      "data": output_filename, 
-      "index": "~{output_filename}.bai"
-      }
-    File aligned_bam_file = output_filename
+    File aligned_bam = output_filename
     File aligned_bam_index = "~{output_filename}.bai"
   }
 

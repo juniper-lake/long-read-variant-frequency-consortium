@@ -1,127 +1,113 @@
 version 1.0
 
-import "structs.wdl"
-
 
 workflow get_sample_movies {
   meta {
-    description: "Finds all movies associated with a sample in the sample sheet."
+    description: "Get all movies and movie info for a sample."
   }
 
   parameter_meta {
     # inputs
-    sample_name: { help: "Name of the sample." }
-    sample_sheet: { 
-      help: "TSV (.txt or .tsv) with following columns (order matters), lines starting with # are ignored (e.g. header): [1] sample_name [2] cohort_name [3] movie_path [4] movie_name [5] is_ubam",
-      patterns: ["*.txt", "*.tsv"]
-    }
+    sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path, movie_name, is_ubam"}
+    sample_name: { help: "Name of the sample."}
+    conda_image: { help: "Docker image with necessary conda environments installed." }
 
-    # outputs
-    movie_names: { description: "Array of movie names." }
+    # outpus
     movie_paths: { description: "Array of movie paths." }
-    is_ubam: { description: "Array of boolean values indicating if the movie is a ubam." }
+    movie_names: { description: "Array of movie names." }
+    is_ubams: { description: "Array of strings indicating if the movie is a ubam." }
   }
 
   input {
-    String sample_name
     File sample_sheet
+    String sample_name
+    String conda_image
   }
-  
-  # turn sample sheet TSV into array of lines
-  call get_lines {
-    input: 
-      sample_name = sample_name,
+
+  call get_sample_sheet_values as get_movie_paths {
+    input:
       sample_sheet = sample_sheet,
+      condition_column = "sample_name",
+      condition_value = sample_name,
+      column_out = "movie_path",
+      conda_image = conda_image
   }
-  
-  # turn each line into variables
-  scatter (line in get_lines.lines) {
-    call split_line {
-      input:
-        line = line,
-    }        
+
+  call get_sample_sheet_values as get_movie_names {
+    input:
+      sample_sheet = sample_sheet,
+      condition_column = "sample_name",
+      condition_value = sample_name,
+      column_out = "movie_name",
+      conda_image = conda_image
+  }
+
+  call get_sample_sheet_values as get_is_ubams {
+    input:
+      sample_sheet = sample_sheet,
+      condition_column = "sample_name",
+      condition_value = sample_name,
+      column_out = "is_ubam",
+      conda_image = conda_image
   }
 
   output {
-    Array[String] movie_names = split_line.movie_name
-    Array[File] movie_paths = split_line.movie_path
-    Array[Boolean] is_ubams = split_line.is_ubam
+    Array[File] movie_paths = get_movie_paths.values
+    Array[String] movie_names = get_movie_names.values
+    Array[String] is_ubams = get_is_ubams.values
   }
 }
 
 
-task get_lines {
+task get_sample_sheet_values {
   meta {
-    description: "Finds all movies associated with a sample in the sample sheet."
+    description: "Get column values from a sample sheet based on condition of a different column."
   }
 
   parameter_meta {
     # inputs
-    sample_name: { help: "Name of the sample." }
-    sample_sheet: { 
-      help: "TSV (.txt or .tsv) with following columns (order matters), lines starting with # are ignored (e.g. header): [1] sample_name [2] cohort_name [3] movie_path [4] movie_name [5] is_ubam",
-      patterns: ["*.txt", "*.tsv"]
-    }
+    sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path, movie_name, is_ubam" }
+    condition_column: { 
+      help: "Column name to use as condition.",
+      choices: ["sample_name", "cohort_name", "movie_path", "movie_name", "is_ubam"] 
+      }
+    condition_value: { help: "Value to use as condition." }
+    column_out: { help: "Column values to output." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
-    lines: "Lines of the sample sheet associated with the sample."
+    values: { description: "Column values." }
   }
 
   input {
-    String sample_name
     File sample_sheet
-    }
-  
+    String condition_column
+    String condition_value
+    String column_out
+    String conda_image
+  }
+
   command {
-    grep -E -v '^(\s*#|$)' ~{sample_sheet} \
-      | awk ' $1=="~{sample_name}" ' \
-    }
+    set -o pipefail
+    source ~/.bashrc
+    conda activate pandas
+    
+    python3 << CODE
+    import pandas as pd
+
+    df = pd.read_csv('~{sample_sheet}', sep='\t', header=0)
+    for value in df[df['~{condition_column}']=='~{condition_value}']['~{column_out}']:
+      print (value)
+    CODE
+  }
 
   output {
-    Array[Array[String]] lines = read_tsv(stdout())
+    Array[String] values = read_lines(stdout())
   }
 
   runtime {
     maxRetries: 3
     preemptible: 1
-    docker: "ubuntu:latest"
+    docker: conda_image
   }
 }
-
-
-task split_line {
-  meta {
-    description: "Converts a line from the sample sheet to variables."
-  }
-
-  parameter_meta {
-    # inputs
-    line: { help: "Line from the sample sheet." }
-
-    # outputs
-    movie_path: "Path to the movie."
-    movie_name: "Name of the movie."
-    is_ubam: "Whether the movie is a ubam or not."
-  }
-
-  input {
-    Array[String] line
-    }
-  
-  command {
-    }
-
-  output {
-    String movie_path = line[2]
-    String movie_name = line[3]
-    Boolean is_ubam = if line[4]=="true" || line[4]=="TRUE" || line[4]=="True" then true else false
-  }
-
-  runtime {
-    maxRetries: 3
-    preemptible: 1
-    docker: "ubuntu:latest"
-  }
-}
-
-

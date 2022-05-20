@@ -8,7 +8,7 @@ workflow get_sample_movies {
 
   parameter_meta {
     # inputs
-    sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path, movie_name, is_ubam"}
+    sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path"}
     sample_name: { help: "Name of the sample."}
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
@@ -33,28 +33,23 @@ workflow get_sample_movies {
       conda_image = conda_image
   }
 
-  call get_sample_sheet_values as get_movie_names {
-    input:
-      sample_sheet = sample_sheet,
-      condition_column = "sample_name",
-      condition_value = sample_name,
-      column_out = "movie_name",
-      conda_image = conda_image
-  }
+  scatter (movie in get_movie_paths.values) {
+    call get_movie_name {
+      input:
+        movie = movie,
+        conda_image = conda_image
+    }
 
-  call get_sample_sheet_values as get_is_ubams {
-    input:
-      sample_sheet = sample_sheet,
-      condition_column = "sample_name",
-      condition_value = sample_name,
-      column_out = "is_ubam",
-      conda_image = conda_image
+    call check_if_ubam {
+      input:
+        movie = movie,
+        conda_image = conda_image
+    }
   }
-
   output {
     Array[File] movie_paths = get_movie_paths.values
-    Array[String] movie_names = get_movie_names.values
-    Array[String] is_ubams = get_is_ubams.values
+    Array[String] movie_names = get_movie_name.movie_name
+    Array[Boolean] is_ubams = check_if_ubam.is_ubam
   }
 }
 
@@ -66,10 +61,10 @@ task get_sample_sheet_values {
 
   parameter_meta {
     # inputs
-    sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path, movie_name, is_ubam" }
+    sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path" }
     condition_column: { 
       help: "Column name to use as condition.",
-      choices: ["sample_name", "cohort_name", "movie_path", "movie_name", "is_ubam"] 
+      choices: ["sample_name", "cohort_name", "movie_path"] 
       }
     condition_value: { help: "Value to use as condition." }
     column_out: { help: "Column values to output." }
@@ -103,6 +98,57 @@ task get_sample_sheet_values {
 
   output {
     Array[String] values = read_lines(stdout())
+  }
+
+  runtime {
+    maxRetries: 3
+    preemptible: 1
+    docker: conda_image
+  }
+}
+
+
+task get_movie_name {
+  input {
+    String movie
+    String movie_filename = basename(movie)
+    String conda_image
+  }
+
+  command<<<
+    FILE=~{movie_filename}
+    echo "${FILE%%.*}"
+  >>>
+
+  output {
+    String movie_name = read_string(stdout())
+  }
+
+  runtime {
+    maxRetries: 3
+    preemptible: 1
+    docker: conda_image
+  }
+}
+
+
+task check_if_ubam {
+  input {
+    String movie
+    String movie_filename = basename(movie)
+    String conda_image
+  }
+
+  command {
+    if [[ ~{movie_filename} == *.bam ]]; then
+      echo "true"
+    else
+      echo "false"
+    fi
+  }
+
+  output {
+    Boolean is_ubam = read_boolean(stdout())
   }
 
   runtime {

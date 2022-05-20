@@ -1,7 +1,0 @@
-channels:
-  - bioconda
-  - conda-forge
-  - defaults
-dependencies:
-  - whatshap==1.0-0
-  - python=3

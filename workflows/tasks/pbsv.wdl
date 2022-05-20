@@ -12,8 +12,8 @@ workflow run_pbsv {
   parameter_meta {
     # inputs
     name: { help: "Name of sample or sample set." }
-    aligned_bams: { help: "Array of aligned BAM files." }
-    aligned_bam_indexes: { help: "Array of aligned BAM index files." }
+    bams: { help: "Array of aligned BAM files." }
+    bais: { help: "Array of aligned BAM index files." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
@@ -30,8 +30,8 @@ workflow run_pbsv {
 
   input {
     String sample_name
-    Array[File] aligned_bams
-    Array[File] aligned_bam_indexes
+    Array[File] bams
+    Array[File] bais
     String reference_name
     File reference_fasta
     File reference_index
@@ -45,8 +45,8 @@ workflow run_pbsv {
     call pbsv_discover.pbsv_discover_signatures_across_bams {
       input: 
         region = region,
-        aligned_bams = aligned_bams,
-        aligned_bam_indexes = aligned_bam_indexes,
+        bams = bams,
+        bais = bais,
         reference_name = reference_name,
         tr_bed = tr_bed,
         conda_image = conda_image
@@ -202,6 +202,7 @@ task concat_pbsv_vcfs {
   Int disk_size = ceil(multiplier * (size(input_vcfs, "GB") + size(input_indexes, "GB"))) + 20
 
   command {
+    set -o pipefail
     source ~/.bashrc
     conda activate bcftools
     conda info

@@ -18,13 +18,13 @@ task run_pbmm2 {
     extra: { help: "Additional pbmm2 options." }
     unmapped: { help: "If true, unmapped reads are added to the output BAM file." }
     sort: { help: "If true, will sort the output bam file." }
-    output_filename: { help: "Name of the output bam file." }
+    output_bam: { help: "Name of the output bam file." }
     threads: { help: "Number of threads to be used." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
-    aligned_bam: { description: "Aligned bam file." }
-    aligned_bam_index: { description: "Aligned bam index." }
+    bam: { description: "Aligned bam file." }
+    bai: { description: "Aligned bam index." }
   }
 
   input {
@@ -39,7 +39,7 @@ task run_pbmm2 {
     String extra = "-c 0 -y 70"
     Boolean unmapped = true
     Boolean sort = true
-    String output_filename = "~{movie_name}.~{reference_name}.bam"
+    String output_bam = "~{movie_name}.~{reference_name}.bam"
     Int threads = 24
     String conda_image
     }
@@ -61,12 +61,12 @@ task run_pbmm2 {
       -j ~{threads} \
       ~{reference_fasta} \
       ~{movie} \
-      ~{output_filename}
+      ~{output_bam}
     }
 
   output {
-    File aligned_bam = output_filename
-    File aligned_bam_index = "~{output_filename}.bai"
+    File bam = output_bam
+    File bai = "~{output_bam}.bai"
   }
 
   runtime {

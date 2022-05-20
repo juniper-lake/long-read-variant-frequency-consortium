@@ -1,5 +1,5 @@
 channels:
   - bioconda
-  - conda-forge
 dependencies:
-  - htsbox==r346
+  - svim==1.4.2
+  

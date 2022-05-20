@@ -73,6 +73,7 @@ task ubam_to_fasta {
   input {
     File movie
     String movie_name
+    String output_fasta = "~{movie_name}.fasta"
     Int threads = 4
     Int threads_m1 = threads - 1
     String conda_image
@@ -89,7 +90,7 @@ task ubam_to_fasta {
   }
 
   output {
-    File fasta = "~{movie_name}.fasta"
+    File fasta = output_fasta
   }
 
   runtime {

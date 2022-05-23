@@ -71,7 +71,7 @@ task svim_alignment {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    output_dir: { help: "Output directory." }
+    output_filename: { help: "Name of output VCF." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs

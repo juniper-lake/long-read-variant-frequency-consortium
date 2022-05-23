@@ -61,7 +61,6 @@ task pbsv_discover_by_region {
     svsig_filename: { help: "Filename for the SV signature file." }
     extra: { help: "Extra parameters to pass to pbsv." }
     log_level: { help: "Log level of pbsv." }
-    output_filename: { help: "Name of the output svsig file." }
     threads: { help: "Number of threads to be used." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 

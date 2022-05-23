@@ -2,8 +2,33 @@ version 1.0
 
 import "common.wdl" as common
 
+workflow run_minimap2 {
+  input {
+    String reference_name
+    File reference_fasta
+    File reference_index
+    Array[File] movies
+    String output_prefix
+    String conda_image
+  }
 
-task run_minimap2 {
+  call minimap2 {
+    input: 
+    reference_name = reference_name,
+    reference_fasta = reference_fasta,
+    reference_index = reference_index,
+    movies = movies,
+    output_prefix = output_prefix,
+    conda_image = conda_image
+  }
+
+  output {
+    File bam = minimap2.bam
+    File bai = minimap2.bai
+  }
+}
+
+task minimap2 {
   meta {
     description: "Aligns reads to a reference genome using minimap2."
   }
@@ -15,6 +40,9 @@ task run_minimap2 {
     reference_index: { help: "Path to the reference genome FAI index file." }
     movies: { help: "Array of FASTQ files to be aligned." }
     output_prefix: { help: "Prefix for output files." }
+    output_bam: { help: "Output BAM filename." }
+    samtools_threads: { help: "Number of threads to use for SAMtools in addition to main thread." }
+    minimap_threads: { help: "Number of threads to use for minimap2." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
@@ -28,12 +56,11 @@ task run_minimap2 {
     File reference_index
     Array[File] movies
     String output_prefix
+    String output_bam = "~{output_prefix}.~{reference_name}.bam"
+    Int samtools_threads = 3
+    Int minimap_threads = 24
     String conda_image
   }
-  
-  String output_bam = "~{output_prefix}.~{reference_name}.bam"
-  Int samtools_threads = 3
-  Int minimap_threads = 24
 
   Float multiplier = 2.5
   Int disk_size = ceil(multiplier * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movies, "GB"))) + 20

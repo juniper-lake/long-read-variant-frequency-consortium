@@ -74,6 +74,7 @@ workflow call_variants_solo {
       reference_fasta = reference_fasta,
       reference_index = reference_index,
       svsigs = run_pbsv_discover.svsigs,
+      svsigs_nested = [],
       tr_bed = tr_bed,
       regions = regions,
       conda_image = conda_image

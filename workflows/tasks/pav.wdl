@@ -1,6 +1,34 @@
 version 1.0
 
-task run_pav {
+workflow run_pav {
+  input {
+    String sample_name
+    File hap1_fasta
+    File hap2_fasta
+    String reference_name
+    File reference_fasta
+    File reference_index
+    String conda_image
+  }
+
+  call pav {
+    input:
+      sample_name = sample_name,
+      hap1_fasta = hap1_fasta,
+      hap2_fasta = hap2_fasta,
+      reference_name = reference_name,
+      reference_fasta = reference_fasta,
+      reference_index = reference_index,
+      conda_image = conda_image
+  }
+  
+  output {
+    File vcf = pav.vcf
+    File index = pav.index
+  }
+}
+
+task pav {
   meta {
     description: "Finds variants from phased assembly using PAV."
   }
@@ -13,6 +41,8 @@ task run_pav {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
+    output_infix: { help: "Infix to add to the output file names." }
+    threads: { help: "Number of threads to use." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
@@ -27,11 +57,11 @@ task run_pav {
     String reference_name
     File reference_fasta
     File reference_index
+    String output_infix = "~{sample_name}_~{reference_name}"
+    Int threads = 48
     String conda_image
   }
 
-  String output_infix = "~{sample_name}_~{reference_name}"
-  Int threads = 48
   Float multiplier = 3.25
   Int disk_size = ceil(multiplier * (size(hap1_fasta, "GB") + size(hap2_fasta, "GB") + size(reference_fasta, "GB"))) + 20
   

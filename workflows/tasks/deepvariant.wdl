@@ -24,7 +24,7 @@ workflow run_deepvariant {
 
   output {
     File vcf = deepvariant.vcf
-    File index = deepvariant.index
+    File index = deepvariant.vcf_index
   }
 }
 

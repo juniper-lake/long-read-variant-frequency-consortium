@@ -173,6 +173,7 @@ workflow call_variants_solo {
     File pbsv_vcf = run_pbsv_call.pbsv_vcf
     Array[File] svsigs = run_pbsv_discover.svsigs
     File deepvariant_vcf = run_deepvariant.vcf
+    File deepvariant_index = run_deepvariant.index
     File minimap2_bam = run_minimap2.bam
     File minimap2_bai = run_minimap2.bai
     File svim_vcf = run_svim.vcf

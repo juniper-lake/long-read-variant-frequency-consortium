@@ -15,9 +15,6 @@ task run_minimap2 {
     reference_index: { help: "Path to the reference genome FAI index file." }
     movies: { help: "Array of FASTQ files to be aligned." }
     output_prefix: { help: "Prefix for output files." }
-    output_bam: { help: "Output BAM filename." }
-    samtools_threads: { help: "Number of threads to use for SAMtools in addition to main thread." }
-    minimap_threads: { help: "Number of threads to use for minimap2." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
@@ -31,11 +28,12 @@ task run_minimap2 {
     File reference_index
     Array[File] movies
     String output_prefix
-    String output_bam = "~{output_prefix}.~{reference_name}.bam"
-    Int samtools_threads = 3
-    Int minimap_threads = 24
     String conda_image
   }
+  
+  String output_bam = "~{output_prefix}.~{reference_name}.bam"
+  Int samtools_threads = 3
+  Int minimap_threads = 24
 
   Float multiplier = 2.5
   Int disk_size = ceil(multiplier * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movies, "GB"))) + 20

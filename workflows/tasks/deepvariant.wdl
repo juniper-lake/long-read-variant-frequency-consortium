@@ -13,11 +13,6 @@ task run_deepvariant {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    model_type: { help: "One of the following [WGS,WES,PACBIO,HYBRID_PACBIO_ILLUMINA]." }
-    output_vcf: { help: "Filename for the output VCF file." }
-    output_gvcf: { help: "Filename for the output GVCF file." }
-    output_report: { help: "Filename for the output visual report file." }
-    threads: { help: "Number of threads to be used." }
     deepvariant_image: { help: "Docker image for Google's DeepVariant." }
 
     # outputs
@@ -36,14 +31,15 @@ task run_deepvariant {
     String reference_name
     File reference_fasta
     File reference_index
-    String model_type = "PACBIO"
-    String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
-    String output_gvcf = "~{sample_name}.~{reference_name}.deepvariant.g.vcf.gz"
-    String output_report = "~{sample_name}.~{reference_name}.deepvariant.visual_report.html"
-    Int threads = 64
     String deepvariant_image
   }
   
+  String model_type = "PACBIO"
+  String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
+  String output_gvcf = "~{sample_name}.~{reference_name}.deepvariant.g.vcf.gz"
+  String output_report = "~{sample_name}.~{reference_name}.deepvariant.visual_report.html"
+  Int threads = 64
+
   Float memory_multiplier = 15
   Int memory = ceil(memory_multiplier * size(bams, "GB"))
   Float disk_multiplier = 3.25

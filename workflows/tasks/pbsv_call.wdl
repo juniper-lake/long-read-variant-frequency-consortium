@@ -12,6 +12,7 @@ workflow run_pbsv_call {
     # inputs
     sample_name: { help: "Name of sample or sample set." }
     svsigs: { help: "Array of SV signature files." }
+    svsigs_nested: { help: "Nested array of SV signature files." }
     regions: { help: "Array of chromosomes or other genomic regions in which to search for SVs." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
@@ -28,8 +29,8 @@ workflow run_pbsv_call {
 
   input {
     String sample_name
-    Array[File]? svsigs
-    Array[Array[File]]? svsigs_nested
+    Array[File] svsigs
+    Array[Array[File]] svsigs_nested = []
     Array[String] regions
     String reference_name
     File reference_fasta
@@ -39,7 +40,7 @@ workflow run_pbsv_call {
   }
   
   # since workflow is used for single and joint calling, input can be an array of files (for singleton) or a nested array of files (for joint)
-  Array[File] svsigs_flattened = if defined(svsigs_nested) then flatten(select_first([svsigs_nested])) else select_first([svsigs])
+  Array[File] svsigs_flattened = flatten([svsigs, flatten(svsigs_nested)])
   
   scatter (idx in range(length(regions))) {
     # using filenames to parse region names, gather all svsigs for a region

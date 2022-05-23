@@ -13,14 +13,15 @@ workflow run_sniffles {
   }
 
   call sniffles {
-    sample_name = sample_name,
-    bam = bam,
-    bai = bai,
-    reference_name = reference_name,
-    reference_fasta = reference_fasta,
-    reference_index = reference_index,
-    tr_bed = tr_bed,
-    conda_image = conda_image
+    input: 
+      sample_name = sample_name,
+      bam = bam,
+      bai = bai,
+      reference_name = reference_name,
+      reference_fasta = reference_fasta,
+      reference_index = reference_index,
+      tr_bed = tr_bed,
+      conda_image = conda_image
   }
 
   output {

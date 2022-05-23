@@ -14,7 +14,7 @@ task run_minimap2 {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     movies: { help: "Array of FASTQ files to be aligned." }
-    prefix: { help: "Prefix for output files." }
+    output_prefix: { help: "Prefix for output files." }
     output_bam: { help: "Output BAM filename." }
     samtools_threads: { help: "Number of threads to use for SAMtools in addition to main thread." }
     minimap_threads: { help: "Number of threads to use for minimap2." }
@@ -30,8 +30,8 @@ task run_minimap2 {
     File reference_fasta
     File reference_index
     Array[File] movies
-    String prefix
-    String output_bam = "~{prefix}.~{reference_name}.bam"
+    String output_prefix
+    String output_bam = "~{output_prefix}.~{reference_name}.bam"
     Int samtools_threads = 3
     Int minimap_threads = 24
     String conda_image

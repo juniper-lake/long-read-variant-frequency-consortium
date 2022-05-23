@@ -51,6 +51,7 @@ task run_sniffles {
 
   output {
     File vcf = output_vcf
+    File index = "~{output_vcf}.tbi"
   }
 
   runtime {

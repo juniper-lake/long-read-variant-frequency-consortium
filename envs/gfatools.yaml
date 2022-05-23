@@ -1,7 +1,8 @@
 channels:
+  - ohmeta
   - bioconda
   - conda-forge
   - defaults
 dependencies:
-  - pbsv=2.8
-  - pbcoretools=0.8.1
+  - gfatools==0.4
+  

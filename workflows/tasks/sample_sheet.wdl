@@ -1,5 +1,6 @@
 version 1.0
 
+import "common.wdl" as common
 
 workflow get_sample_movies {
   meta {
@@ -33,23 +34,8 @@ workflow get_sample_movies {
       conda_image = conda_image
   }
 
-  scatter (movie in get_movie_paths.values) {
-    call get_movie_name {
-      input:
-        movie = movie,
-        conda_image = conda_image
-    }
-
-    call check_if_ubam {
-      input:
-        movie = movie,
-        conda_image = conda_image
-    }
-  }
   output {
     Array[File] movie_paths = get_movie_paths.values
-    Array[String] movie_names = get_movie_name.movie_name
-    Array[Boolean] is_ubams = check_if_ubam.is_ubam
   }
 }
 
@@ -107,53 +93,3 @@ task get_sample_sheet_values {
   }
 }
 
-
-task get_movie_name {
-  input {
-    String movie
-    String movie_filename = basename(movie)
-    String conda_image
-  }
-
-  command<<<
-    FILE=~{movie_filename}
-    echo "${FILE%%.*}"
-  >>>
-
-  output {
-    String movie_name = read_string(stdout())
-  }
-
-  runtime {
-    maxRetries: 3
-    preemptible: 1
-    docker: conda_image
-  }
-}
-
-
-task check_if_ubam {
-  input {
-    String movie
-    String movie_filename = basename(movie)
-    String conda_image
-  }
-
-  command {
-    if [[ ~{movie_filename} == *.bam ]]; then
-      echo "true"
-    else
-      echo "false"
-    fi
-  }
-
-  output {
-    Boolean is_ubam = read_boolean(stdout())
-  }
-
-  runtime {
-    maxRetries: 3
-    preemptible: 1
-    docker: conda_image
-  }
-}

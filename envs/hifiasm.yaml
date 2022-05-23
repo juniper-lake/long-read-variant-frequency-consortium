@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pbsv=2.8
-  - pbcoretools=0.8.1
+  - hifiasm=0.16.1
+  

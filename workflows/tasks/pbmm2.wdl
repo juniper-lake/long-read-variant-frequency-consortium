@@ -1,6 +1,64 @@
 version 1.0
 
-task run_pbmm2 {
+import "common.wdl" as common
+
+workflow run_pbmm2 {
+  meta {
+    description: "Align array of movies using pbmm2."
+  }
+
+  parameter_meta {
+    # inputs
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
+    movies: { help: "Array of BAMs and/or FASTQs containing HiFi reads." }
+    sample_name: { help: "Name of the sample." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
+
+    # outputs
+    bams: { description: "Array of aligned bam file." }
+    bais: { description: "Array of aligned bam index." }
+  }
+
+  input {
+    String reference_name
+    File reference_fasta
+    File reference_index
+    Array[File] movies
+    String sample_name
+    String conda_image
+  }
+  
+  scatter (idx in range(length(movies))) { 
+    # for each movie, get the movie name for file naming
+    call common.get_movie_name {
+      input:
+        movie = movies[idx],
+        conda_image = conda_image
+    }
+    
+    # align each movie with pbmm2
+    call pbmm2_align {
+        input: 
+          reference_name = reference_name,
+          reference_fasta = reference_fasta,
+          reference_index = reference_index,
+          movie = movies[idx],
+          movie_name = get_movie_name.movie_name,
+          sample_name = sample_name,
+          conda_image = conda_image
+    }
+  }
+
+  output {
+    Array[File] bams = pbmm2_align.bam
+    Array[File] bais = pbmm2_align.bai
+  }
+}
+
+
+task pbmm2_align {
   meta {
     description: "Aligns HiFi reads to reference genome from either a BAM or FASTQ file."
   }
@@ -78,4 +136,3 @@ task run_pbmm2 {
     docker: conda_image
   }
 }
-

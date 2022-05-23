@@ -1,9 +1,9 @@
 version: 1.2
 workflows:
-  - name: single-sample
+  - name: call-variants-single-sample
     subclass: WDL
-    primaryDescriptorPath: /workflows/single_sample.wdl
-    testParameterFiles: /inputs/single_sample.inputs.json
+    primaryDescriptorPath: /workflows/call_variants.wdl
+    testParameterFiles: /inputs/call_variants.inputs.json
     authors:
       - name: "Juniper Lake"
         email: "jlake@pacificbiosciences.com"

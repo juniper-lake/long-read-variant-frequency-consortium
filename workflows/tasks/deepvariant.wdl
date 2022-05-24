@@ -24,7 +24,7 @@ workflow run_deepvariant {
 
   output {
     File vcf = deepvariant.vcf
-    File index = deepvariant.vcf_index
+    File index = deepvariant.index
   }
 }
 
@@ -43,18 +43,12 @@ task deepvariant {
     reference_index: { help: "Path to the reference genome FAI index file." }
     model_type: { help: "One of the following [WGS,WES,PACBIO,HYBRID_PACBIO_ILLUMINA]." }
     output_vcf: { help: "Filename for the output VCF file." }
-    output_gvcf: { help: "Filename for the output GVCF file." }
-    output_report: { help: "Filename for the output visual report file." }
     threads: { help: "Number of threads to be used." }
     deepvariant_image: { help: "Docker image for Google's DeepVariant." }
 
     # outputs
     vcf: { description: "Small variant calls output by DeepVariant." }
-    vcf_index: { description: "VCF index for small variants called by DeepVariant." }
-    gvcf: { description: "Global VCF of small variant calls output by DeepVariant." }
-    gvcf_index: { description: "GVCF index for small variants called by DeepVariant." }
-    report: { description: "Visual report of the small variant calls output by DeepVariant." }
-
+    index: { description: "VCF index for small variants called by DeepVariant." }
   }
   
   input {
@@ -66,8 +60,6 @@ task deepvariant {
     File reference_index
     String model_type = "PACBIO"
     String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
-    String output_gvcf = "~{sample_name}.~{reference_name}.deepvariant.g.vcf.gz"
-    String output_report = "~{sample_name}.~{reference_name}.deepvariant.visual_report.html"
     Int threads = 64
     String deepvariant_image
   }
@@ -84,16 +76,12 @@ task deepvariant {
       --ref=~{reference_fasta} \
       --reads=~{sep="," bams} \
       --output_vcf=~{output_vcf} \
-      --output_gvcf=~{output_gvcf} \
       --num_shards=~{threads}
   }
 
   output {
     File vcf = output_vcf
-    File vcf_index = "~{vcf}.tbi"
-    File gvcf = output_gvcf
-    File gvcf_index = "~{gvcf}.tbi"
-    File report = output_report
+    File index = "~{vcf}.tbi"
   }
 
   runtime {

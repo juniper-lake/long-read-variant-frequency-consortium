@@ -28,6 +28,7 @@ workflow run_deepvariant {
   }
 }
 
+
 task deepvariant {
   meta {
     description: "Calls small variants from aligned BAMs with DeepVariant."
@@ -81,7 +82,7 @@ task deepvariant {
 
   output {
     File vcf = output_vcf
-    File index = "~{vcf}.tbi"
+    File index = "~{output_vcf}.tbi"
   }
 
   runtime {

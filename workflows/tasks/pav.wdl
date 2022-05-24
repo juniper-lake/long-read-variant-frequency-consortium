@@ -78,7 +78,7 @@ task pav {
 
   output {
     File vcf = "pav_~{output_infix}.vcf.gz"
-    File index = "~{vcf}.tbi"
+    File index = "pav_~{output_infix}.vcf.gz.tbi"
   }
 
   runtime {

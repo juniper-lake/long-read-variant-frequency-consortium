@@ -3,6 +3,24 @@ version 1.0
 import "common.wdl" as common
 
 workflow run_minimap2 {
+  meta {
+    description: "Aligns reads to a reference genome using minimap2."
+  }
+
+  parameter_meta {
+    # inputs
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
+    movies: { help: "Array of FASTQ files to be aligned." }
+    output_prefix: { help: "Prefix for output files." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
+
+    # outputs
+    bam: { description: "Output BAM filename." }
+    bai: { description: "Output BAM index filename." }
+  }
+
   input {
     String reference_name
     File reference_fasta

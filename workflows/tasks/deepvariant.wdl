@@ -1,6 +1,25 @@
 version 1.0
 
 workflow run_deepvariant {
+  meta {
+    description: "Calls small variants from aligned BAMs with DeepVariant."
+  }
+
+  parameter_meta {
+    # inputs
+    sample_name: { help: "Name of the sample." }
+    bams: { help: "Array of aligned BAM files." }
+    bais: { help: "Array of aligned BAM index files." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
+    deepvariant_image: { help: "Docker image for Google's DeepVariant." }
+
+    # outputs
+    vcf: { description: "Small variant calls output by DeepVariant." }
+    index: { description: "VCF index for small variants called by DeepVariant." }
+  }
+
   input {
     String sample_name
     Array[File] bams

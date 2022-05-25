@@ -1,6 +1,25 @@
 version 1.0
 
 workflow run_pav {
+  meta {
+    description: "Finds variants from phased assembly using PAV."
+  }
+
+  parameter_meta {
+    # inputs
+    sample_name: { help: "Name of the sample." }
+    hap1_fasta: { help: "Fasta file for haplotype 1." }
+    hap2_fasta: { help: "Fasta file for haplotype 2." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
+
+    # outputs
+    vcf: { description: "VCF containing variants called using PAV." }
+    index: { description: "Index file for the VCF." }
+  }
+
   input {
     String sample_name
     File hap1_fasta

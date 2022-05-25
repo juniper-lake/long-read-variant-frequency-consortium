@@ -1,6 +1,26 @@
 version 1.0
 
 workflow run_sniffles {
+  meta {
+    description: "Call structural variants from aligned reads with Sniffles2."
+  }
+
+  parameter_meta {
+    # inputs
+    sample_name: { help: "Name of the sample." }
+    bam: { help: "BAM file of aligned reads." }
+    bai: { help: "BAM index file." }
+    reference_name: { help: "Name of the the reference genome, used for file labeling." }
+    reference_fasta: { help: "Path to the reference genome FASTA file." }
+    reference_index: { help: "Path to the reference genome FAI index file." }
+    tr_bed: { help: "BED file containing known tandem repeats." }
+    conda_image: { help: "Docker image with necessary conda environments installed." }
+
+    # outputs
+    vcf: { description: "VCF with structural variants called by Sniffles2." }
+    index: { description: "VCF index file." }
+  }
+
   input {
     String sample_name
     File bam
@@ -51,6 +71,7 @@ task sniffles {
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
+    index: { description: "VCF index file." }
   }
   input {
     String sample_name

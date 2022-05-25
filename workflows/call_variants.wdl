@@ -158,8 +158,9 @@ workflow call_variants_solo {
   output {
     Array[File] pbmm2_bams = run_pbmm2.bams
     Array[File] pbmm2_bais = run_pbmm2.bais
-    File pbsv_vcf = run_pbsv_call.pbsv_vcf
-    Array[File] svsigs = run_pbsv_discover.svsigs
+    File pbsv_vcf = run_pbsv.vcf
+    File pbsv_index = run_pbsv.index
+    Array[File] pbsv_svsigs = run_pbsv.svsigs
     File deepvariant_vcf = run_deepvariant.vcf
     File deepvariant_index = run_deepvariant.index
     File minimap2_bam = run_minimap2.bam
@@ -170,8 +171,8 @@ workflow call_variants_solo {
     File sniffles_index = run_sniffles.index
     File cutesv_vcf = run_cutesv.vcf
     File cutesv_index = run_cutesv.index
-    File hap1_fasta = run_hifiasm.hap1_fasta
-    File hap2_fasta = run_hifiasm.hap2_fasta
+    File hifiasm_hap1_fasta = run_hifiasm.hap1_fasta
+    File hifiasm_hap2_fasta = run_hifiasm.hap2_fasta
     File pav_vcf = run_pav.vcf
     File pav_index = run_pav.index
   }

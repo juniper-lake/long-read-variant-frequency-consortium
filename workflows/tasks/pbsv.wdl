@@ -86,10 +86,10 @@ workflow run_pbsv {
 
   output {
     Array[File] svsigs = pbsv_discover_by_region.svsig
-    File pbsv_vcf = zip_and_index_final_vcf.vcf
-    File pbsv_index = zip_and_index_final_vcf.index
-    Array[File] pbsv_region_vcfs = zip_and_index_vcf.vcf
-    Array[File] pbsv_region_indexes = zip_and_index_vcf.index
+    File vcf = zip_and_index_final_vcf.vcf
+    File index = zip_and_index_final_vcf.index
+    Array[File] region_vcfs = zip_and_index_vcf.vcf
+    Array[File] region_indexes = zip_and_index_vcf.index
   }
 }
 

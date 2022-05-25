@@ -2,18 +2,17 @@ version 1.0
 
 import "common.wdl" as common
 
-
-workflow run_pbsv_call {
-  meta { 
-    description: "Discovers SV signatures and calls SVs for either single samples or a sample set (joint calling)."
+workflow run_pbsv {
+  meta {
+    description: "Discovers SV signatures and calls SVs."
   }
-  
+
   parameter_meta {
     # inputs
-    sample_name: { help: "Name of sample or sample set." }
-    svsigs: { help: "Array of SV signature files." }
-    svsigs_nested: { help: "Nested array of SV signature files." }
-    regions: { help: "Array of chromosomes or other genomic regions in which to search for SVs." }
+    sample_name: { help: "Name of the sample." }
+    regions: { help: "Array of regions of the genome to search for SV signatures, e.g. chr1." }
+    bams: { help: "Array of aligned BAM files." }
+    bais: { help: "Array of bam BAI indexes."}
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
@@ -21,48 +20,45 @@ workflow run_pbsv_call {
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
-    pbsv_vcf: { description: "Genome-wide VCF with SVs called from all provided BAMs (singleton or joint)." }
-    pbsv_index: { description: "Index file for the VCF." }
-    pbsv_region_vcfs: { description: "Region-specific VCFs with SVs called from all provided BAMs (singleton or joint)." }
-    pbsv_region_indexes: { description: "Region-specific VCF indexes." }
+    svsigs: { description: "SV signature files for all regions." }
   }
 
   input {
     String sample_name
-    Array[File] svsigs
-    Array[Array[File]] svsigs_nested = []
     Array[String] regions
+    Array[File] bams
+    Array[File] bais
     String reference_name
     File reference_fasta
     File reference_index
     File tr_bed
     String conda_image
   }
-  
-  # since workflow is used for single and joint calling, input can be an array of files (for singleton) or a nested array of files (for joint)
-  Array[File] svsigs_flattened = flatten([svsigs, flatten(svsigs_nested)])
-  
+
   scatter (idx in range(length(regions))) {
-    # using filenames to parse region names, gather all svsigs for a region
-    call subset_svsigs_by_region {
-      input: 
-        input_svsigs = svsigs_flattened,
+    # for each region, discover SV signatures
+    call pbsv_discover_by_region {
+      input:
+        sample_name = sample_name,
         region = regions[idx],
+        bams = bams,
+        bais = bais,
+        tr_bed = tr_bed,
         conda_image = conda_image
     }
-
-    # call variants by region
+    
+    # for each region, call SVs
     call pbsv_call_by_region {
-      input: 
+      input:
         sample_name = sample_name,
-        svsigs = subset_svsigs_by_region.svsigs,
+        svsigs = [pbsv_discover_by_region.svsig],
         reference_name = reference_name,
         reference_fasta = reference_fasta,
         reference_index = reference_index,
         region = regions[idx],
         conda_image = conda_image
-    }    
-
+    }
+    
     # zip and index region-specific VCFs
     call common.zip_and_index_vcf {
       input: 
@@ -89,6 +85,7 @@ workflow run_pbsv_call {
   }
 
   output {
+    Array[File] svsigs = pbsv_discover_by_region.svsig
     File pbsv_vcf = zip_and_index_final_vcf.vcf
     File pbsv_index = zip_and_index_final_vcf.index
     Array[File] pbsv_region_vcfs = zip_and_index_vcf.vcf
@@ -97,36 +94,74 @@ workflow run_pbsv_call {
 }
 
 
-task subset_svsigs_by_region {
+task pbsv_discover_by_region {
   meta {
-    description: "Given an array of svsigs, parse filenames to determine which svsigs are for the given region."
+    description: "Discovers SV signatures for a given region from multiple BAMs."
   }
 
   parameter_meta {
     # inputs
-    input_svsigs: { help: "Array of SV signature files." }
-    region: { help: "Region of the genome to use for subsetting input_svsigs." }
+    sample_name: { help: "Name of the sample." }
+    region: { help: "Region of the genome to search for SV signatures, e.g. chr1." }
+    bams: { help: "Array of aligned BAM file." }
+    bais: { help: "Array of aligned BAM index (BAI) file." }
+    tr_bed: { help: "BED file containing known tandem repeats." }
+    svsig_filename: { help: "Filename for the SV signature file." }
+    extra: { help: "Extra parameters to pass to pbsv." }
+    log_level: { help: "Log level of pbsv." }
+    threads: { help: "Number of threads to be used." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
-    svsigs: { description: "Array of SV signature files for the given region." }
+    svsig: { description: "SV signature file to be used for calling SVs." }
   }
 
   input {
-    Array[File] input_svsigs
+    String sample_name
     String region
+    Array[File] bams
+    Array[File] bais
+    File tr_bed
+    String svsig_filename = "~{sample_name}.~{region}.svsig.gz"
+    String extra = "--hifi"
+    String log_level = "INFO"
+    Int threads = 4
     String conda_image
-  }
+    }
 
-  command {
-    ls ~{sep=" " input_svsigs} | grep -F ".~{region}.svsig.gz"
-  }
+  Float multiplier = 3.25
+  Int disk_size = ceil(multiplier * (size(bams, "GB"))) + 20
+
+  command<<<
+    set -o pipefail
+    source ~/.bashrc
+    conda activate pbsv
+    
+    # symlink bams and bais to a single folder so indexes can be found
+    mkdir bams_and_bais
+    for file in $(ls ~{sep=" " bams} ~{sep=" " bais}); do 
+      ln -s $(readlink -f $file) bams_and_bais
+    done
+    
+    # make XML dataset so all bams can be processed with one pbsv command
+    dataset create --type AlignmentSet --novalidate --force ~{region}.xml bams_and_bais/*.bam
+
+    pbsv discover ~{extra} \
+      --log-level ~{log_level} \
+      --region ~{region} \
+      --tandem-repeats ~{tr_bed} \
+      ~{region}.xml \
+      ~{svsig_filename}
+    >>>
 
   output {
-    Array[File] svsigs = read_lines(stdout())
+    File svsig = svsig_filename
   }
 
   runtime {
+    cpu: threads
+    memory: "16GB"
+    disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
     docker: conda_image
@@ -142,7 +177,7 @@ task pbsv_call_by_region {
   parameter_meta {
     # inputs
     sample_name: { help: "Name of sample (if singleton) or group (if set of samples)." }
-    svsigs: { help: "SV signature files to be used for calling SVs." }
+    svsigs: { help: "SV signature files for region specified to be used for calling SVs." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }

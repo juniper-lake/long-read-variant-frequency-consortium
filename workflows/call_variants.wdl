@@ -1,8 +1,7 @@
 version 1.0
 
 import "tasks/pbmm2.wdl" as pbmm2
-import "tasks/pbsv_discover.wdl" as pbsv_discover
-import "tasks/pbsv_call.wdl" as pbsv_call
+import "tasks/pbsv.wdl" as pbsv
 import "tasks/deepvariant.wdl" as deepvariant
 import "tasks/fasta.wdl" as fasta
 import "tasks/minimap2.wdl" as minimap2
@@ -55,26 +54,15 @@ workflow call_variants_solo {
       conda_image = conda_image
   }
 
-  # run pbsv discover
-  call pbsv_discover.run_pbsv_discover {
+  # run pbsv 
+  call pbsv.run_pbsv {
     input: 
       sample_name = sample_name,
       bams = run_pbmm2.bams,
       bais = run_pbmm2.bais,
-      tr_bed = tr_bed,
-      regions = regions,
-      conda_image = conda_image
-  }
-
-  # run pbsv call
-  call pbsv_call.run_pbsv_call {
-    input: 
-      sample_name = sample_name,
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      svsigs = run_pbsv_discover.svsigs,
-      svsigs_nested = [],
       tr_bed = tr_bed,
       regions = regions,
       conda_image = conda_image

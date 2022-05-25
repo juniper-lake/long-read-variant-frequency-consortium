@@ -65,8 +65,6 @@ task deepvariant {
     String deepvariant_image
   }
   
-  Float memory_multiplier = 15
-  Int memory = ceil(memory_multiplier * size(bams, "GB"))
   Float disk_multiplier = 3.25
   Int disk_size = ceil(disk_multiplier * (size(reference_fasta, "GB") + size(bams, "GB"))) + 20
 
@@ -87,7 +85,7 @@ task deepvariant {
 
   runtime {
     cpu: threads
-    memory: "~{memory}GB"
+    memory: "256GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

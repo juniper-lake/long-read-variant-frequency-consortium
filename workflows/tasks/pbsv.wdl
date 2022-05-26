@@ -206,8 +206,7 @@ task pbsv_call_by_region {
     String conda_image
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * (size(svsigs, "GB") + size(reference_fasta, "GB"))) + 20
+  Int disk_size = 200
 
   command<<<
     set -o pipefail
@@ -235,7 +234,7 @@ task pbsv_call_by_region {
   
   runtime {
     cpu: threads
-    memory: "32GB"
+    memory: "48GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

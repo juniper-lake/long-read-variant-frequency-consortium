@@ -1,6 +1,8 @@
 version 1.0
 
-import "common.wdl" as common
+# import "common.wdl" as common
+
+import "https://raw.githubusercontent.com/juniper-lake/long-read-variant-frequency-consortium/azure_test/workflows/tasks/common.wdl" as common
 
 workflow run_pbmm2 {
   meta {

@@ -1,9 +1,106 @@
 version: 1.2
 workflows:
-  - name: call-variants-single-sample
+  - name: call_variants
     subclass: WDL
     primaryDescriptorPath: /workflows/call_variants.wdl
     testParameterFiles: /inputs/call_variants.inputs.json
     authors:
       - name: "Juniper Lake"
         email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: cutesv
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/cutesv.wdl
+    testParameterFiles: /inputs/cutesv.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: deepvariant
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/deepvariant.wdl
+    testParameterFiles: /inputs/deepvariant.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: fasta
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/fasta.wdl
+    testParameterFiles: /inputs/fasta.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: hifiasm
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/hifiasm.wdl
+    testParameterFiles: /inputs/hifiasm.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: minimap2
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/minimap2.wdl
+    testParameterFiles: /inputs/minimap2.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: mosdepth
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/mosdepth.wdl
+    testParameterFiles: /inputs/mosdepth.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: pav
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/pav.wdl
+    testParameterFiles: /inputs/pav.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: pbmm2
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/pbmm2.wdl
+    testParameterFiles: /inputs/pbmm2.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: pbsv
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/pbsv.wdl
+    testParameterFiles: /inputs/pbsv.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: sample_sheet
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/sample_sheet.wdl
+    testParameterFiles: /inputs/sample_sheet.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: sniffles
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/sniffles.wdl
+    testParameterFiles: /inputs/sniffles.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
+  - name: svim
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/svim.wdl
+    testParameterFiles: /inputs/svim.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645

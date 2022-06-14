@@ -13,7 +13,7 @@ import "tasks/hifiasm.wdl" as hifiasm
 import "tasks/pav.wdl" as pav
 
 
-workflow call_variants_solo {
+workflow call_variants {
   meta { 
     description: "Align HiFi reads to reference genome and call variants for a single sample."
   }

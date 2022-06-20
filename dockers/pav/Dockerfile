@@ -12,13 +12,13 @@ RUN conda update -n base -c defaults conda
 
 # Create environment
 COPY dockers/envs/${TOOL}_${VERSION}.yaml .
-RUN conda env create --file ${TOOL}_${VERSION}.yaml --name ${TOOL}
+RUN conda env create --file ${TOOL}_${VERSION}.yaml --name myenv
 
 # Make run commands use new environment
-SHELL ["conda", "run", "--name", "${TOOL}", "/bin/bash", "-c"]
+SHELL ["conda", "run", "--name", "myenv", "/bin/bash", "-c"]
 
 # Code to run when container is started
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "${TOOL}"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv"]
 
 # Clone PAV git repo
 RUN git clone --recursive https://github.com/EichlerLab/pav.git pav

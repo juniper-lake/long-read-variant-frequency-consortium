@@ -33,6 +33,50 @@ task get_movie_name {
 }
 
 
+task sort_vcf {
+  meta {
+    description: "Sorts a vcf file."
+  }
+
+  parameter_meta {
+    # inputs
+    input_vcf: { help: "VCF file to be sorted." }
+    output_filename: { help: "Output filename." }
+    docker_image: { help: "Docker image with bcftools." }
+
+    # outputs
+    vcf: { description: "Gzipped and indexed VCF file." }
+  }
+
+  input {
+    File input_vcf
+    String output_filename = "~{basename(input_vcf)}_sorted.vcf"
+    String docker_image
+  }
+
+  Float multiplier = 3.25
+  Int disk_size = ceil(multiplier * size(input_vcf, "GB")) + 20
+
+  command {
+    set -o pipefail
+    bcftools sort ~{input_vcf} -Ov -o ~{output_filename}
+  }
+
+  output {
+    File vcf = output_filename
+  }
+
+  runtime {
+    cpu: threads
+    memory: "16GB"
+    disks: "local-disk ~{disk_size} HDD"
+    maxRetries: 3
+    preemptible: 1
+    docker: docker_image
+  }
+}
+
+
 task zip_and_index_vcf {
   meta {
     description: "Zips and indexes a vcf file."

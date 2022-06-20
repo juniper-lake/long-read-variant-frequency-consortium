@@ -44,10 +44,17 @@ workflow run_svim {
       conda_image = conda_image
   }
 
+  # sort VCF
+  call common.sort_vcf {
+    input:
+      input_vcf = svim_alignment.vcf,
+      output_filename = "~{sample_name}.~{reference_name}.svim.vcf"
+  }
+
   # zip and index VCF
   call common.zip_and_index_vcf {
     input:
-      input_vcf = svim_alignment.vcf,
+      input_vcf = sort_vcf.vcf,
       conda_image = conda_image
   }
 
@@ -71,7 +78,7 @@ task svim_alignment {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    output_filename: { help: "Name of output VCF." }
+    output_directory: { help: "Name of output VCF." }
     conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
@@ -85,7 +92,7 @@ task svim_alignment {
     String reference_name
     File reference_fasta
     File reference_index
-    String output_filename = "~{sample_name}_~{reference_name}.svim.vcf"
+    String output_directory = "~{sample_name}_~{reference_name}"
     String conda_image
   }
 
@@ -96,14 +103,11 @@ task svim_alignment {
     set -o pipefail
     source ~/.bashrc
     conda activate svim
-    svim alignment output ~{bam} ~{reference_fasta}
-    conda deactivate
-    conda activate bcftools
-    bcftools sort output/variants.vcf -Ov -o ~{output_filename}
+    svim alignment ~{output_directory} ~{bam} ~{reference_fasta}
   }
 
   output {
-    File vcf = output_filename
+    File vcf = "~{output_filename}/variants.vcf"
   }
 
   runtime {

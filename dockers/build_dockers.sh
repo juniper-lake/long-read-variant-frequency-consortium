@@ -2,7 +2,7 @@
 
 # usage: run `bash dockers/build_dockers.sh` from the root directory of project
 
-set -euo pipefail
+set -eo pipefail
 
 function build_docker () {
   # using the tool/dir name
@@ -10,7 +10,7 @@ function build_docker () {
   # get the version of the primary tool/docker
   local -r version=$(echo $2 | cut -d"=" -f2)
   # get the relative path to the docker
-  local -r dockerfile_path="${@[-1]}"
+  local -r dockerfile_path="${@: -1}"
   # get the images name
   local -r image_name="juniperlake/${tool}:${version}"
   # get additional arguments with the "--build-arg" option

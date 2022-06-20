@@ -8,7 +8,6 @@ workflow convert_to_fasta {
   parameter_meta {
     # inputs
     movies: { help: "Array of movies." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     fastas: { help: "Array of FASTA/FASTQ files." }
@@ -16,7 +15,6 @@ workflow convert_to_fasta {
 
   input {
     Array[File] movies
-    String conda_image
   }
 
   scatter (idx in range(length(movies))) {
@@ -24,7 +22,6 @@ workflow convert_to_fasta {
     call check_if_ubam {
       input:
         movie = movies[idx],
-        conda_image = conda_image
     }
 
     # if ubam, convert to fasta
@@ -32,7 +29,6 @@ workflow convert_to_fasta {
       call ubam_to_fasta {
         input:
         movie = movies[idx],
-        conda_image = conda_image
       }
     }  
 
@@ -41,7 +37,6 @@ workflow convert_to_fasta {
       call do_nothing {
         input:
           input_file = movies[idx],
-          conda_image = conda_image
       }
     }
   }
@@ -60,7 +55,6 @@ task check_if_ubam {
   parameter_meta {
     # inputs
     movie: { help: "Movie file." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     is_ubam: { help: "True if movie is a ubam." }
@@ -68,7 +62,6 @@ task check_if_ubam {
 
   input {
     String movie
-    String conda_image
   }
 
   command {
@@ -86,7 +79,7 @@ task check_if_ubam {
   runtime {
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "ubuntu:20.04"
   }
 }
 
@@ -102,7 +95,6 @@ task ubam_to_fasta {
     movie_name: { help: "Name of the movie, used for file naming." }
     threads: { help: "Number of threads to be used." }
     threads_m1: { help: "Total number of threads minus 1, because samtools is silly." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     fasta: { description: "FASTA file." }
@@ -114,7 +106,6 @@ task ubam_to_fasta {
     String output_fasta = "~{movie_name}.fasta"
     Int threads = 4
     Int threads_m1 = threads - 1
-    String conda_image
   }
   
   Float multiplier = 3.25
@@ -122,8 +113,6 @@ task ubam_to_fasta {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate samtools
     samtools fasta -@ ~{threads_m1} ~{movie} > ~{output_fasta}
   }
 
@@ -137,7 +126,7 @@ task ubam_to_fasta {
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/samtools:1.14"
   }
 }
 
@@ -151,7 +140,6 @@ task do_nothing {
     # inputs
     input_file: { help: "File to be passed to output file." }
     input_string: { help: "String to be passed to output string." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     output_file: { description: "Output file." }
@@ -161,7 +149,6 @@ task do_nothing {
   input {
     File input_file = ""
     String input_string = ""
-    String conda_image
   }
 
   command {
@@ -175,6 +162,6 @@ task do_nothing {
   runtime {
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "ubuntu:20.04"
   }
 }

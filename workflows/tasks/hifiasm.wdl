@@ -8,13 +8,11 @@ workflow run_hifiasm {
   parameter_meta {
     sample_name: { help: "Name of sample, used for file naming." }
     movies: { help: "Array of HiFi movie files in FASTA/FASTQ format." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
   }
 
   input {
     String sample_name
     Array[File] movies
-    String conda_image
   }
   
   # assemble HiFi reads
@@ -22,35 +20,30 @@ workflow run_hifiasm {
     input:
       sample_name = sample_name,
       movies = movies,
-      conda_image = conda_image
   }
   
   # convert hap1 from gfa to fasta
   call gfa2fa as gfa2fa_hap1 {
     input:
       gfa = hifiasm_assemble.hap1,
-      conda_image = conda_image
   }
 
   # convert hap2 from gfa to fasta
   call gfa2fa as gfa2fa_hap2 {
     input:
       gfa = hifiasm_assemble.hap2,
-      conda_image = conda_image
   }
 
   # zip hap1 fasta
   call bgzip_fasta as bgzip_hap1 {
     input:
       fasta = gfa2fa_hap1.fasta,
-      conda_image = conda_image
   }
 
   # zip hap2 fasta
   call bgzip_fasta as bgzip_hap2 {
     input:
       fasta = gfa2fa_hap2.fasta,
-      conda_image = conda_image
   }
   
   output {
@@ -71,7 +64,6 @@ task hifiasm_assemble {
     movies: { help: "Array of HiFi movie files in FASTA/FASTQ format." }
     output_prefix: { help: "Prefix for output files." }
     threads: { help: "Number of threads to use." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     hap1: { description: "GFA file of hap1 assembly." }
@@ -83,7 +75,6 @@ task hifiasm_assemble {
     Array[File] movies
     String output_prefix = "~{sample_name}.asm"
     Int threads = 48
-    String conda_image
   }
 
   Float multiplier = 3.25
@@ -92,9 +83,6 @@ task hifiasm_assemble {
   
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda info --envs
-    conda activate hifiasm
     hifiasm -o ~{output_prefix} -t ~{threads} ~{sep=" " movies}
   }
 
@@ -109,7 +97,7 @@ task hifiasm_assemble {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/hifiasm:0.16.1"
   }
 }
 
@@ -124,7 +112,6 @@ task gfa2fa {
     gfa: { help: "GFA file to convert." }
     output_filename: { help: "Filename for output FASTA." }
     threads: { help: "Number of threads to use." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
     
     # outputs
     fasta: { description: "FASTA file." }
@@ -133,7 +120,6 @@ task gfa2fa {
     File gfa
     String output_filename = "~{basename(gfa, '.bam')}.fasta"
     Int threads = 4
-    String conda_image
   }
 
   Float multiplier = 3.25
@@ -141,8 +127,6 @@ task gfa2fa {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate gfatools
     gfatools gfa2fa ~{gfa} > ~{output_filename}
   }
 
@@ -156,7 +140,7 @@ task gfa2fa {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/gfatools:0.4"
   }
 }
 
@@ -171,7 +155,6 @@ task bgzip_fasta {
     fasta: { help: "FASTA file to zip." }
     output_filename: { help: "Filename for output zipped FASTA." }
     threads: { help: "Number of threads to use." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     gzipped_fasta: { description: "Zipped FASTA file." }
@@ -181,7 +164,6 @@ task bgzip_fasta {
     File fasta
     String output_filename = "~{basename(fasta)}.gz"
     Int threads = 4
-    String conda_image
   }
 
   Float multiplier = 3.25
@@ -189,8 +171,6 @@ task bgzip_fasta {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate htslib
     bgzip --threads ~{threads} ~{fasta} -c > ~{output_filename}
   }
 
@@ -204,6 +184,6 @@ task bgzip_fasta {
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/htslib:1.14"
   }
 }

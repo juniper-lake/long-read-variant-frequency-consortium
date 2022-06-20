@@ -14,7 +14,6 @@ workflow run_sniffles {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
@@ -29,7 +28,6 @@ workflow run_sniffles {
     File reference_fasta
     File reference_index
     File tr_bed 
-    String conda_image
   }
 
   call sniffles {
@@ -41,7 +39,6 @@ workflow run_sniffles {
       reference_fasta = reference_fasta,
       reference_index = reference_index,
       tr_bed = tr_bed,
-      conda_image = conda_image
   }
 
   output {
@@ -67,7 +64,6 @@ task sniffles {
     tr_bed: { help: "BED file containing known tandem repeats." }
     output_vcf: { help: "Filename for output VCF." }
     threads: { help: "Number of threads to be used." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
@@ -83,7 +79,6 @@ task sniffles {
     File tr_bed
     String output_vcf = "~{sample_name}.~{reference_name}.sniffles.vcf.gz"
     Int threads = 8
-    String conda_image
   }
 
   Float multiplier = 2.5
@@ -91,8 +86,6 @@ task sniffles {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate sniffles
     sniffles \
       --threads ~{threads} \
       --reference ~{reference_fasta} \
@@ -112,6 +105,6 @@ task sniffles {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/sniffles:2.0"
   }
 }

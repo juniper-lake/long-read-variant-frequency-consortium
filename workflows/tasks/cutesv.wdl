@@ -15,7 +15,6 @@ workflow run_cutesv {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
@@ -29,7 +28,6 @@ workflow run_cutesv {
     String reference_name
     File reference_fasta
     File reference_index
-    String conda_image
   }
   
   # call structural variants with cuteSV
@@ -41,14 +39,12 @@ workflow run_cutesv {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      conda_image = conda_image
   }
 
   # zip and index VCF
   call common.zip_and_index_vcf {
     input:
       input_vcf = cutesv.vcf,
-      conda_image = conda_image
   }
 
   output {
@@ -79,7 +75,6 @@ task cutesv {
     diff_ratio_merging_INS: { help: "Do not merge breakpoints with basepair identity more than the ratio of default for insertion." }
     diff_ratio_merging_DEL: { help: "Do not merge breakpoints with basepair identity more than the ratio of default for deletion." }
     threads: { help: "Number of threads to be used." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
@@ -99,7 +94,6 @@ task cutesv {
     Int max_cluster_bias_DEL = 1000
     Float diff_ratio_merging_DEL = 0.5
     Int threads = 16
-    String conda_image
   }
 
   Float multiplier = 2.5
@@ -107,8 +101,6 @@ task cutesv {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate cutesv
     cuteSV \
       --threads ~{threads} \
       --max_cluster_bias_INS ~{max_cluster_bias_INS} \
@@ -128,6 +120,6 @@ task cutesv {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/cutesv:1.0.13"
   }
 }

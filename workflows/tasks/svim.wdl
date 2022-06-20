@@ -15,7 +15,6 @@ workflow run_svim {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "Gzipped VCF with structural variants called by SVIM." }
@@ -29,7 +28,6 @@ workflow run_svim {
     String reference_name
     File reference_fasta
     File reference_index
-    String conda_image
   }
 
   # call structural variants from aligned bam file with SVIM
@@ -41,7 +39,6 @@ workflow run_svim {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      conda_image = conda_image
   }
 
   # sort VCF
@@ -55,7 +52,6 @@ workflow run_svim {
   call common.zip_and_index_vcf {
     input:
       input_vcf = sort_vcf.vcf,
-      conda_image = conda_image
   }
 
   output {
@@ -79,7 +75,6 @@ task svim_alignment {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     output_directory: { help: "Name of output VCF." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF with structural variants called by SVIM." }
@@ -93,7 +88,6 @@ task svim_alignment {
     File reference_fasta
     File reference_index
     String output_directory = "~{sample_name}_~{reference_name}"
-    String conda_image
   }
 
   Float multiplier = 2.5
@@ -101,8 +95,6 @@ task svim_alignment {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate svim
     svim alignment ~{output_directory} ~{bam} ~{reference_fasta}
   }
 
@@ -115,6 +107,6 @@ task svim_alignment {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/svim:1.4.2"
   }
 }

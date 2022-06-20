@@ -13,7 +13,6 @@ workflow run_pav {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF containing variants called using PAV." }
@@ -27,7 +26,6 @@ workflow run_pav {
     String reference_name
     File reference_fasta
     File reference_index
-    String conda_image
   }
 
   call pav {
@@ -38,7 +36,6 @@ workflow run_pav {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      conda_image = conda_image
   }
   
   output {
@@ -62,7 +59,6 @@ task pav {
     reference_index: { help: "Path to the reference genome FAI index file." }
     output_infix: { help: "Infix to add to the output file names." }
     threads: { help: "Number of threads to use." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF containing variants called using PAV." }
@@ -78,7 +74,6 @@ task pav {
     File reference_index
     String output_infix = "~{sample_name}_~{reference_name}"
     Int threads = 48
-    String conda_image
   }
 
   Float multiplier = 3.25
@@ -86,8 +81,6 @@ task pav {
   
   command<<<
     set -o pipefail
-    source ~/.bashrc
-    conda activate pav
     
     echo '{"reference": "~{reference_fasta}"}' > config.json
     echo -e "NAME\tHAP1\tHAP2" > assemblies.tsv
@@ -106,6 +99,6 @@ task pav {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/pav:c2bfbe6"
   }
 }

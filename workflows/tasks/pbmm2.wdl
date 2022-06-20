@@ -14,7 +14,6 @@ workflow run_pbmm2 {
     reference_index: { help: "Path to the reference genome FAI index file." }
     movies: { help: "Array of BAMs and/or FASTQs containing HiFi reads." }
     sample_name: { help: "Name of the sample." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     bams: { description: "Array of aligned bam file." }
@@ -27,7 +26,6 @@ workflow run_pbmm2 {
     File reference_index
     Array[File] movies
     String sample_name
-    String conda_image
   }
   
   scatter (idx in range(length(movies))) { 
@@ -35,7 +33,6 @@ workflow run_pbmm2 {
     call common.get_movie_name {
       input:
         movie = movies[idx],
-        conda_image = conda_image
     }
     
     # align each movie with pbmm2
@@ -47,7 +44,6 @@ workflow run_pbmm2 {
           movie = movies[idx],
           movie_name = get_movie_name.movie_name,
           sample_name = sample_name,
-          conda_image = conda_image
     }
   }
 
@@ -78,7 +74,6 @@ task pbmm2_align {
     sort: { help: "If true, will sort the output bam file." }
     output_bam: { help: "Name of the output bam file." }
     threads: { help: "Number of threads to be used." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     bam: { description: "Aligned bam file." }
@@ -99,7 +94,6 @@ task pbmm2_align {
     Boolean sort = true
     String output_bam = "~{movie_name}.~{reference_name}.bam"
     Int threads = 24
-    String conda_image
     }
 
   Float multiplier = 2.5
@@ -107,8 +101,6 @@ task pbmm2_align {
   
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate pbmm2
     pbmm2 align \
       --sample ~{sample_name} \
       --log-level ~{log_level} \
@@ -133,6 +125,6 @@ task pbmm2_align {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/pbmm2:1.7.0"
   }
 }

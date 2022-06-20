@@ -14,7 +14,6 @@ workflow run_minimap2 {
     reference_index: { help: "Path to the reference genome FAI index file." }
     movies: { help: "Array of FASTQ files to be aligned." }
     output_prefix: { help: "Prefix for output files." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     bam: { description: "Output BAM filename." }
@@ -27,7 +26,6 @@ workflow run_minimap2 {
     File reference_index
     Array[File] movies
     String output_prefix
-    String conda_image
   }
 
   call minimap2 {
@@ -37,7 +35,6 @@ workflow run_minimap2 {
     reference_index = reference_index,
     movies = movies,
     output_prefix = output_prefix,
-    conda_image = conda_image
   }
 
   output {
@@ -61,7 +58,6 @@ task minimap2 {
     output_bam: { help: "Output BAM filename." }
     samtools_threads: { help: "Number of threads to use for SAMtools in addition to main thread." }
     minimap_threads: { help: "Number of threads to use for minimap2." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     bam: { description: "Output BAM filename." }
@@ -77,7 +73,6 @@ task minimap2 {
     String output_bam = "~{output_prefix}.~{reference_name}.bam"
     Int samtools_threads = 3
     Int minimap_threads = 24
-    String conda_image
   }
 
   Float multiplier = 2.5
@@ -85,8 +80,6 @@ task minimap2 {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate minimap2
     minimap2 -t ~{minimap_threads} -ax map-hifi ~{reference_fasta} ~{sep=" " movies} \
       | samtools sort -@ ~{samtools_threads} > ~{output_bam}
     samtools index ~{output_bam}
@@ -103,6 +96,6 @@ task minimap2 {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/minimap2:2.24"
   }
 }

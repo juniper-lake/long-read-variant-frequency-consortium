@@ -8,12 +8,10 @@ task get_movie_name {
 
   parameter_meta {
     movie: { help: "The movie file path to get the name of." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
   }
 
   input {
     String movie
-    String conda_image
   }
 
   command<<<
@@ -28,7 +26,7 @@ task get_movie_name {
   runtime {
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "ubuntu:20.04"
   }
 }
 
@@ -88,7 +86,6 @@ task zip_and_index_vcf {
     tabix_extra: { help: "Extra arguments for tabix." }
     output_filename: { help: "Output filename." }
     threads: { help: "Number of threads to use." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "Gzipped and indexed VCF file." }
@@ -100,7 +97,6 @@ task zip_and_index_vcf {
     String tabix_extra = "--preset vcf"
     String output_filename = "~{basename(input_vcf)}.gz"
     Int threads = 2
-    String conda_image
   }
 
   Float multiplier = 3.25
@@ -108,8 +104,6 @@ task zip_and_index_vcf {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate htslib
     bgzip --threads ~{threads} ~{input_vcf} -c > ~{output_filename}
     tabix ~{tabix_extra} ~{output_filename}
   }
@@ -125,6 +119,6 @@ task zip_and_index_vcf {
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/htslib:1.14"
   }
 }

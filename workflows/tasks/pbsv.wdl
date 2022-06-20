@@ -17,7 +17,6 @@ workflow run_pbsv {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     svsigs: { description: "SV signature files for all regions." }
@@ -32,7 +31,6 @@ workflow run_pbsv {
     File reference_fasta
     File reference_index
     File tr_bed
-    String conda_image
   }
 
   scatter (idx in range(length(regions))) {
@@ -44,7 +42,6 @@ workflow run_pbsv {
         bams = bams,
         bais = bais,
         tr_bed = tr_bed,
-        conda_image = conda_image
     }
     
     # for each region, call SVs
@@ -56,14 +53,12 @@ workflow run_pbsv {
         reference_fasta = reference_fasta,
         reference_index = reference_index,
         region = regions[idx],
-        conda_image = conda_image
     }
     
     # zip and index region-specific VCFs
     call common.zip_and_index_vcf {
       input: 
         input_vcf = pbsv_call_by_region.vcf,
-        conda_image = conda_image
     }
   }
 
@@ -74,14 +69,12 @@ workflow run_pbsv {
       reference_name = reference_name,
       input_vcfs = zip_and_index_vcf.vcf,
       input_indexes = zip_and_index_vcf.index,
-      conda_image = conda_image
   }
 
   # gzip and index the genome-wide VCF
   call common.zip_and_index_vcf as zip_and_index_final_vcf {
     input: 
       input_vcf = concat_pbsv_vcfs.vcf,
-      conda_image = conda_image
   }
 
   output {
@@ -110,7 +103,6 @@ task pbsv_discover_by_region {
     extra: { help: "Extra parameters to pass to pbsv." }
     log_level: { help: "Log level of pbsv." }
     threads: { help: "Number of threads to be used." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     svsig: { description: "SV signature file to be used for calling SVs." }
@@ -126,7 +118,6 @@ task pbsv_discover_by_region {
     String extra = "--hifi"
     String log_level = "INFO"
     Int threads = 4
-    String conda_image
     }
 
   Float multiplier = 3.25
@@ -134,8 +125,6 @@ task pbsv_discover_by_region {
 
   command<<<
     set -o pipefail
-    source ~/.bashrc
-    conda activate pbsv
     
     # symlink bams and bais to a single folder so indexes can be found
     mkdir bams_and_bais
@@ -164,7 +153,7 @@ task pbsv_discover_by_region {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/pbsv:2.8"
   }
 }
 
@@ -186,7 +175,6 @@ task pbsv_call_by_region {
     log_level: { help: "Log level." }
     output_filename: { help: "Name of the output VCF file." }
     threads: { help: "Number of threads to be used." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     # outputs
     vcf: { description: "VCF file containing the called SVs." }
@@ -203,15 +191,12 @@ task pbsv_call_by_region {
     String log_level = "INFO"
     String output_filename = "~{sample_name}.~{reference_name}.~{region}.pbsv.vcf"
     Int threads = 8
-    String conda_image
   }
 
   Int disk_size = 200
 
   command<<<
     set -o pipefail
-    source ~/.bashrc
-    conda activate pbsv
 
     for svsig in ~{sep=" " svsigs}; do
       if [[ $svsig != *~{region}.svsig.gz ]]; then
@@ -238,7 +223,7 @@ task pbsv_call_by_region {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/pbsv:2.8"
   }
 }
 
@@ -257,7 +242,6 @@ task concat_pbsv_vcfs {
     extra: { help: "Extra parameters to pass to bcftools." }
     output_filename: { help: "Name of the output VCF file." }
     threads: { help: "Number of threads to be used." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
 
     #outputs
     vcf: { description: "VCF file containing the concatenated SV calls." }
@@ -271,7 +255,6 @@ task concat_pbsv_vcfs {
     String extra = "--allow-overlaps"
     String output_filename = "~{sample_name}.~{reference_name}.pbsv.vcf"
     Int threads = 4
-    String conda_image
   }
 
   Float multiplier = 3.25
@@ -279,9 +262,6 @@ task concat_pbsv_vcfs {
 
   command {
     set -o pipefail
-    source ~/.bashrc
-    conda activate bcftools
-    conda info
     bcftools concat ~{extra} \
       --output ~{output_filename} \
       ~{sep=" " input_vcfs} \
@@ -297,6 +277,6 @@ task concat_pbsv_vcfs {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: conda_image
+    docker: "juniperlake/bcftools:1.14"
   }
 }

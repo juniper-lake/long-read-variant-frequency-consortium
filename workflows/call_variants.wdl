@@ -27,7 +27,6 @@ workflow call_variants {
     reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats for reference genome." }
     regions: { help: "Array of regions to call variants in, used for parallel processing of genome." }
-    conda_image: { help: "Docker image with necessary conda environments installed." }
     deepvariant_image: { help: "Docker image for Google's DeepVariant (single-pass optimized)." }
   }
 
@@ -39,7 +38,6 @@ workflow call_variants {
     File reference_index
     File tr_bed
     Array[String] regions
-    String conda_image
     String deepvariant_image
   }
 
@@ -51,7 +49,6 @@ workflow call_variants {
       reference_index = reference_index,
       movies = hifi_reads,
       sample_name = sample_name,
-      conda_image = conda_image
   }
 
   # run pbsv 
@@ -65,7 +62,6 @@ workflow call_variants {
       reference_index = reference_index,
       tr_bed = tr_bed,
       regions = regions,
-      conda_image = conda_image
   }
 
   # run deepvariant
@@ -84,7 +80,6 @@ workflow call_variants {
   call fasta.convert_to_fasta {
     input: 
       movies = hifi_reads,
-      conda_image = conda_image
   }
 
   # run minimap2
@@ -95,7 +90,6 @@ workflow call_variants {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      conda_image = conda_image
   }
 
   # run svim on minimap2 alignments
@@ -107,7 +101,6 @@ workflow call_variants {
       reference_fasta = reference_fasta,
       reference_index = reference_index,
       reference_name = reference_name,
-      conda_image = conda_image
   }
 
   # run sniffles on minimap2 alignment
@@ -120,7 +113,6 @@ workflow call_variants {
       reference_index = reference_index,
       reference_name = reference_name,
       tr_bed = tr_bed,
-      conda_image = conda_image
   }
 
   # run cutesv on minimap2 alignment
@@ -132,7 +124,6 @@ workflow call_variants {
       reference_fasta = reference_fasta,
       reference_index = reference_index,
       reference_name = reference_name,
-      conda_image = conda_image
   }
   
   # assemble reads into phased assemblies with hifiasm
@@ -140,7 +131,6 @@ workflow call_variants {
     input:
       sample_name = sample_name,
       movies = convert_to_fasta.fastas,
-      conda_image = conda_image
   }
 
   # call variants from phased assemblies with pav
@@ -152,7 +142,6 @@ workflow call_variants {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      conda_image = conda_image
   }
 
   output {

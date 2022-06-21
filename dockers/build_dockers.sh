@@ -34,6 +34,7 @@ build_docker TOOL=hifiasm VERSION=0.16.1 dockers/Dockerfile
 build_docker TOOL=htslib VERSION=1.14 dockers/Dockerfile
 build_docker TOOL=jasmine VERSION=1.1.5 dockers/Dockerfile
 build_docker TOOL=minimap2 VERSION=2.24 dockers/Dockerfile
+build_docker TOOL=mosdepth VERSION=0.2.9 dockers/Dockerfile
 build_docker TOOL=pandas VERSION=1.1.0 dockers/Dockerfile
 build_docker TOOL=pav VERSION=c2bfbe6 HASH=c2bfbe6a285484e56f8d97ee162b82c4e5cd4966 dockers/pav/Dockerfile
 build_docker TOOL=pbmm2 VERSION=1.7.0 dockers/Dockerfile

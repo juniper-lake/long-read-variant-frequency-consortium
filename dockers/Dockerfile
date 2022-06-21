@@ -10,9 +10,10 @@ ARG VERSION
 # Update conda version
 RUN conda update -n base -c defaults conda
 
-# Create environment
+# Create environment and add to path
 COPY ./dockers/envs/${TOOL}_${VERSION}.yaml ./
 RUN conda env create --file ${TOOL}_${VERSION}.yaml --name ${TOOL}
+ENV PATH /opt/conda/envs/${TOOL}/bin:$PATH
 
-# Need to source ~/.bashrc in docker command
+# Add to ~/.bashrc in case it needs to be sourced
 RUN echo "source activate ${TOOL}" >> ~/.bashrc

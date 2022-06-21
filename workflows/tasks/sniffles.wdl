@@ -86,7 +86,6 @@ task sniffles {
 
   command {
     set -o pipefail
-    source ~/.bashrc
     sniffles \
       --threads ~{threads} \
       --reference ~{reference_fasta} \

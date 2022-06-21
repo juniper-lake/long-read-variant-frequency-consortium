@@ -65,7 +65,6 @@ task get_sample_sheet_values {
 
   command {
     set -o pipefail
-    source ~/.bashrc
     
     python3 << CODE
     import pandas as pd

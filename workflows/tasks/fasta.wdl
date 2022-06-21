@@ -113,6 +113,7 @@ task ubam_to_fasta {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     samtools fasta -@ ~{threads_m1} ~{movie} > ~{output_fasta}
   }
 

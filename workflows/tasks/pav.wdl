@@ -81,7 +81,7 @@ task pav {
   
   command<<<
     set -o pipefail
-    
+    source ~/.bashrc
     echo '{"reference": "~{reference_fasta}"}' > config.json
     echo -e "NAME\tHAP1\tHAP2" > assemblies.tsv
     echo -e "~{output_infix}\t~{hap1_fasta}\t~{hap2_fasta}" >> assemblies.tsv

@@ -95,6 +95,7 @@ task svim_alignment {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     svim alignment ~{output_directory} ~{bam} ~{reference_fasta}
   }
 

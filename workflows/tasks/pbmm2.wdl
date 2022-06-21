@@ -101,6 +101,7 @@ task pbmm2_align {
   
   command {
     set -o pipefail
+    source ~/.bashrc
     pbmm2 align \
       --sample ~{sample_name} \
       --log-level ~{log_level} \

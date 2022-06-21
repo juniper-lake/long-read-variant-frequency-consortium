@@ -57,6 +57,7 @@ task sort_vcf {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     bcftools sort ~{input_vcf} -Ov -o ~{output_filename}
   }
 
@@ -104,6 +105,7 @@ task zip_and_index_vcf {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     bgzip --threads ~{threads} ~{input_vcf} -c > ~{output_filename}
     tabix ~{tabix_extra} ~{output_filename}
   }

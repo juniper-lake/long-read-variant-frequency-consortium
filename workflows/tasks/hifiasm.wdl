@@ -83,6 +83,7 @@ task hifiasm_assemble {
   
   command {
     set -o pipefail
+    source ~/.bashrc
     hifiasm -o ~{output_prefix} -t ~{threads} ~{sep=" " movies}
   }
 
@@ -127,6 +128,7 @@ task gfa2fa {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     gfatools gfa2fa ~{gfa} > ~{output_filename}
   }
 
@@ -171,6 +173,7 @@ task bgzip_fasta {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     bgzip --threads ~{threads} ~{fasta} -c > ~{output_filename}
   }
 

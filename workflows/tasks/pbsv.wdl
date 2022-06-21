@@ -125,6 +125,7 @@ task pbsv_discover_by_region {
 
   command<<<
     set -o pipefail
+    source ~/.bashrc
     
     # symlink bams and bais to a single folder so indexes can be found
     mkdir bams_and_bais
@@ -197,6 +198,7 @@ task pbsv_call_by_region {
 
   command<<<
     set -o pipefail
+    source ~/.bashrc
 
     for svsig in ~{sep=" " svsigs}; do
       if [[ $svsig != *~{region}.svsig.gz ]]; then
@@ -262,6 +264,7 @@ task concat_pbsv_vcfs {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     bcftools concat ~{extra} \
       --output ~{output_filename} \
       ~{sep=" " input_vcfs} \

@@ -101,6 +101,7 @@ task cutesv {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     cuteSV \
       --threads ~{threads} \
       --max_cluster_bias_INS ~{max_cluster_bias_INS} \

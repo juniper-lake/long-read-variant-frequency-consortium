@@ -80,6 +80,7 @@ task minimap2 {
 
   command {
     set -o pipefail
+    source ~/.bashrc
     minimap2 -t ~{minimap_threads} -ax map-hifi ~{reference_fasta} ~{sep=" " movies} \
       | samtools sort -@ ~{samtools_threads} > ~{output_bam}
     samtools index ~{output_bam}

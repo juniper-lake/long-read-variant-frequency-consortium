@@ -11,21 +11,20 @@ ARG HASH
 RUN conda update -n base -c defaults conda
 
 # Create environment
-COPY dockers/envs/${TOOL}_${VERSION}.yaml .
+COPY ./dockers/envs/${TOOL}_${VERSION}.yaml ./
 RUN conda env create --file ${TOOL}_${VERSION}.yaml --name myenv
 
-# Make run commands use new environment
-SHELL ["conda", "run", "--name", "myenv", "/bin/bash", "-c"]
-
-# Code to run when container is started
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv"]
+# Add environment to bashrc
+RUN echo "conda activate myenv" >> ~/.bashrc
 
 # Clone PAV git repo
-RUN git clone --recursive https://github.com/EichlerLab/pav.git pav
+RUN git clone --recursive https://github.com/EichlerLab/pav.git /app/pav
 
 # Reset PAV git repo to specific commit hash
 WORKDIR /app/pav
 RUN git reset --hard ${HASH}
 
-# Add PAV location as a variable so it can be called from workflow
-RUN echo "export PAV=/app/pav" >> ~/.bashrc
+# Code to run when container is started
+WORKDIR /app
+COPY ./dockers/entrypoint.sh ./
+ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]

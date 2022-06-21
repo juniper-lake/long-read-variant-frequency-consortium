@@ -1,7 +1,8 @@
-# Set base image
+# This Dockerfile is used for all environments except PAV
+
 FROM continuumio/miniconda3
 
-WORKDIR /app
+WORKDIR /src
 
 ARG TOOL
 ARG VERSION
@@ -11,11 +12,7 @@ RUN conda update -n base -c defaults conda
 
 # Create environment
 COPY ./dockers/envs/${TOOL}_${VERSION}.yaml ./
-RUN conda env create --file ${TOOL}_${VERSION}.yaml --name myenv
+RUN conda env create --file ${TOOL}_${VERSION}.yaml --name ${TOOL}
 
-# Add environment to bashrc
-RUN echo "conda activate myenv" >> ~/.bashrc
-
-# Code to run when container is started
-COPY ./dockers/entrypoint.sh ./
-ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]
+# Need to source ~/.bashrc in docker command
+RUN echo "source activate ${TOOL}" >> ~/.bashrc

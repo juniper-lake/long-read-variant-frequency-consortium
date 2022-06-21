@@ -11,7 +11,7 @@ task get_movie_name {
   }
 
   input {
-    String movie
+    File movie
   }
 
   command<<<
@@ -49,7 +49,6 @@ task sort_vcf {
   input {
     File input_vcf
     String output_filename = "~{basename(input_vcf)}_sorted.vcf"
-    String docker_image
   }
 
   Float multiplier = 3.25
@@ -65,12 +64,11 @@ task sort_vcf {
   }
 
   runtime {
-    cpu: threads
     memory: "16GB"
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
-    docker: docker_image
+    docker: "juniperlake/bcftools:1.14"
   }
 }
 

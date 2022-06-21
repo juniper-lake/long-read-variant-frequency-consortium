@@ -99,7 +99,7 @@ task svim_alignment {
   }
 
   output {
-    File vcf = "~{output_filename}/variants.vcf"
+    File vcf = "~{output_directory}/variants.vcf"
   }
 
   runtime {

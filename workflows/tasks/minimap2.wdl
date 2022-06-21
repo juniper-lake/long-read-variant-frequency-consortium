@@ -1,7 +1,5 @@
 version 1.0
 
-import "common.wdl" as common
-
 workflow run_minimap2 {
   meta {
     description: "Aligns reads to a reference genome using minimap2."
@@ -42,6 +40,7 @@ workflow run_minimap2 {
     File bai = minimap2.bai
   }
 }
+
 
 task minimap2 {
   meta {

@@ -128,8 +128,8 @@ task pbsv_discover_by_region {
     
     # symlink bams and bais to a single folder so indexes can be found
     mkdir bams_and_bais
-    for file in $(ls ~{sep=" " bams} ~{sep=" " bais}); do 
-      ln -s $(readlink -f $file) bams_and_bais
+    for file in ~{sep=" " bams} ~{sep=" " bais}; do 
+      ln -s "$(readlink -f $file)" bams_and_bais
     done
     
     # make XML dataset so all bams can be processed with one pbsv command

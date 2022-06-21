@@ -5,7 +5,7 @@ import "tasks/pbsv.wdl" as pbsv
 import "tasks/deepvariant.wdl" as deepvariant
 import "tasks/fasta.wdl" as fasta
 import "tasks/minimap2.wdl" as minimap2
-import "tasks/common.wdl" as common
+import "tasks/mosdepth.wdl" as mosdepth
 import "tasks/svim.wdl" as svim
 import "tasks/sniffles.wdl" as sniffles
 import "tasks/cutesv.wdl" as cutesv
@@ -49,6 +49,13 @@ workflow call_variants {
       reference_index = reference_index,
       movies = hifi_reads,
       sample_name = sample_name,
+  }
+
+  # check coverage
+  call mosdepth.run_mosdepth {
+    input:
+      bams = run_pbmm2.bams,
+      bais = run_pbmm2.bais
   }
 
   # run pbsv 
@@ -147,6 +154,8 @@ workflow call_variants {
   output {
     Array[File] pbmm2_bams = run_pbmm2.bams
     Array[File] pbmm2_bais = run_pbmm2.bais
+    Array[Float] mosdepth_coverages = run_mosdepth.coverages
+    Float mosdepth_total_coverage = run_mosdepth.total_coverage
     File pbsv_vcf = run_pbsv.vcf
     File pbsv_index = run_pbsv.index
     Array[File] pbsv_svsigs = run_pbsv.svsigs

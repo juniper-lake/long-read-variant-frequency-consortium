@@ -61,7 +61,7 @@ task check_if_ubam {
   }
 
   input {
-    String movie
+    File movie
   }
 
   command {
@@ -139,7 +139,6 @@ task do_nothing {
   parameter_meta {
     # inputs
     input_file: { help: "File to be passed to output file." }
-    input_string: { help: "String to be passed to output string." }
 
     # outputs
     output_file: { description: "Output file." }
@@ -147,8 +146,7 @@ task do_nothing {
   }
 
   input {
-    File input_file = ""
-    String input_string = ""
+    File input_file
   }
 
   command {
@@ -156,7 +154,6 @@ task do_nothing {
 
   output {
     File output_file = input_file
-    String output_string = input_string
   }
 
   runtime {

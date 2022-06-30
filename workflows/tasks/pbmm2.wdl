@@ -134,7 +134,6 @@ task pbmm2_align {
     memory: "96GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
-    preemptible: 1
     docker: conda_image
   }
 }

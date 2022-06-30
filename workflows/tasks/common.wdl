@@ -27,7 +27,6 @@ task get_movie_name {
 
   runtime {
     maxRetries: 3
-    preemptible: 1
     docker: conda_image
   }
 }

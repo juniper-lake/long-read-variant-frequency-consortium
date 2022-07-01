@@ -1,6 +1,7 @@
 {
     "sample_name": "HG002",
-    "hifi_reads": ["movie1.ccs.bam", "movie2.ccs.bam"],
+    "bams": ["movie1.GRCh38_no_alt.bam", "movie2.GRCh38_no_alt.bam"],
+    "bais": ["movie1.GRCh38_no_alt.bam.bai", "movie2.GRCh38_no_alt.bam.bai"],
     "reference_name": "GRCh38_no_alt", 
     "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
     "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai",

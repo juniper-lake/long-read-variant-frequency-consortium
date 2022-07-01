@@ -1,0 +1,4 @@
+{
+    "sample_name": "HG002",
+    "movie_fastxs": ["movie1.fastq", "movie2.fasta"]
+}

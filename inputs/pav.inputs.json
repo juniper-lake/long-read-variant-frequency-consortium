@@ -1,0 +1,8 @@
+{
+    "sample_name": "HG002",
+    "hap1_fasta": "HG002.asm.bp.hap1.p_ctg.fasta.gz",
+    "hap2_fasta": "HG002.asm.bp.hap2.p_ctg.fasta.gz",
+    "reference_name": "GRCh38_no_alt", 
+    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
+    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai"
+}

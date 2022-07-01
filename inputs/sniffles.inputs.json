@@ -1,0 +1,9 @@
+{
+    "sample_name": "HG002",
+    "bam": "HG002.GRCh38_no_alt.bam",
+    "bai": "HG002.GRCh38_no_alt.bam.bai",
+    "reference_name": "GRCh38_no_alt", 
+    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
+    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai",
+    "tr_bed": "human_GRCh38_no_alt_analysis_set.trf.bed"
+}

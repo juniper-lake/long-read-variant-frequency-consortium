@@ -96,6 +96,14 @@ workflows:
       - name: "Juniper Lake"
         email: "jlake@pacificbiosciences.com"
         orcid: 0000-0001-7628-5645
+  - name: somalier
+    subclass: WDL
+    primaryDescriptorPath: /workflows/tasks/somalier.wdl
+    testParameterFiles: /inputs/somalier.inputs.json
+    authors:
+      - name: "Juniper Lake"
+        email: "jlake@pacificbiosciences.com"
+        orcid: 0000-0001-7628-5645
   - name: svim
     subclass: WDL
     primaryDescriptorPath: /workflows/tasks/svim.wdl

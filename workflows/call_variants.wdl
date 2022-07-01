@@ -1,16 +1,17 @@
 version 1.0
 
-import "tasks/pbmm2.wdl" as pbmm2
-import "tasks/pbsv.wdl" as pbsv
+import "tasks/cutesv.wdl" as cutesv
 import "tasks/deepvariant.wdl" as deepvariant
 import "tasks/fasta.wdl" as fasta
+import "tasks/hifiasm.wdl" as hifiasm
 import "tasks/minimap2.wdl" as minimap2
 import "tasks/mosdepth.wdl" as mosdepth
-import "tasks/svim.wdl" as svim
-import "tasks/sniffles.wdl" as sniffles
-import "tasks/cutesv.wdl" as cutesv
-import "tasks/hifiasm.wdl" as hifiasm
 import "tasks/pav.wdl" as pav
+import "tasks/pbmm2.wdl" as pbmm2
+import "tasks/pbsv.wdl" as pbsv
+import "tasks/sniffles.wdl" as sniffles
+import "tasks/somalier.wdl" as somalier
+import "tasks/svim.wdl" as svim
 
 
 workflow call_variants {
@@ -26,6 +27,7 @@ workflow call_variants {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats for reference genome." }
+    sites_vcf: { help: "List of known polymorphic sites provided by somalier." }
     regions: { help: "Array of regions to call variants in, used for parallel processing of genome." }
   }
 
@@ -36,6 +38,7 @@ workflow call_variants {
     File reference_fasta
     File reference_index
     File tr_bed
+    File sites_vcf
     Array[String] regions
   }
 
@@ -54,6 +57,18 @@ workflow call_variants {
     input:
       bams = run_pbmm2.bams,
       bais = run_pbmm2.bais
+  }
+
+  # check sample swaps
+  call somalier.run_somalier {
+    input:
+      sample_name = sample_name,
+      bams = run_pbmm2.bams,
+      bais = run_pbmm2.bais,
+      reference_name = reference_name,
+      reference_fasta = reference_fasta,
+      reference_index = reference_index,
+      sites_vcf = sites_vcf
   }
 
   # run pbsv 
@@ -153,6 +168,8 @@ workflow call_variants {
     Array[File] pbmm2_bais = run_pbmm2.bais
     Array[Float] mosdepth_coverages = run_mosdepth.coverages
     Float mosdepth_total_coverage = run_mosdepth.total_coverage
+    File somalier_pairs = run_somalier.pairs
+    Int somalier_min_relatedness = run_somalier.min_relatedness
     File pbsv_vcf = run_pbsv.vcf
     File pbsv_index = run_pbsv.index
     Array[File] pbsv_svsigs = run_pbsv.svsigs

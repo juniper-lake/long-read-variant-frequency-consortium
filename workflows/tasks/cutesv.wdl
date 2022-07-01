@@ -93,6 +93,7 @@ task cutesv {
     set -o pipefail
     cuteSV \
       --threads ~{threads} \
+      --sample ~{sample_name}_cutesv \
       --genotype \
       --min_size 30 \
       --min_mapq 20 \

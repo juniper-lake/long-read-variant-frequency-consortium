@@ -87,6 +87,7 @@ task sniffles {
     set -o pipefail
     sniffles \
       --threads ~{threads} \
+      --sample-id ~{sample_name}_sniffles
       --minsvlen 30 \
       --mapq 20 \
       --minsupport 2 \

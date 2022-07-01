@@ -132,6 +132,7 @@ task pbsv_discover_by_region {
     dataset create --type AlignmentSet --novalidate --force ~{region}.xml bams_and_bais/*.bam
 
     pbsv discover \
+      --sample ~{sample_name}_pbsv \
       --hifi \
       --min-mapq 20 \
       --region ~{region} \

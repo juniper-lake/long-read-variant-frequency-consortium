@@ -87,7 +87,6 @@ task svim_alignment {
     String reference_name
     File reference_fasta
     File reference_index
-    String output_directory = "~{sample_name}_~{reference_name}"
   }
 
   Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
@@ -95,16 +94,17 @@ task svim_alignment {
   command {
     set -o pipefail
     svim alignment \
+      --sample ~{sample_name}_svim
       --min_sv_size 30 \
       --min_mapq 20 \
       --minimum_depth 2 \
-      ~{output_directory} \
+      "." \
       ~{bam} \
       ~{reference_fasta}
   }
 
   output {
-    File vcf = "~{output_directory}/variants.vcf"
+    File vcf = "variants.vcf"
   }
 
   runtime {

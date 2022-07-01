@@ -89,7 +89,7 @@ workflow run_pbsv {
 
 task pbsv_discover_by_region {
   meta {
-    description: "Discovers SV signatures for a given region from multiple BAMs."
+    description: "Find structural variant (SV) signatures in read alignments (BAM to SVSIG)."
   }
 
   parameter_meta {
@@ -100,8 +100,6 @@ task pbsv_discover_by_region {
     bais: { help: "Array of aligned BAM index (BAI) file." }
     tr_bed: { help: "BED file containing known tandem repeats." }
     svsig_filename: { help: "Filename for the SV signature file." }
-    extra: { help: "Extra parameters to pass to pbsv." }
-    log_level: { help: "Log level of pbsv." }
     threads: { help: "Number of threads to be used." }
 
     # outputs
@@ -115,8 +113,6 @@ task pbsv_discover_by_region {
     Array[File] bais
     File tr_bed
     String svsig_filename = "~{sample_name}.~{region}.svsig.gz"
-    String extra = "--hifi"
-    String log_level = "INFO"
     Int threads = 4
     }
 
@@ -135,8 +131,9 @@ task pbsv_discover_by_region {
     # make XML dataset so all bams can be processed with one pbsv command
     dataset create --type AlignmentSet --novalidate --force ~{region}.xml bams_and_bais/*.bam
 
-    pbsv discover ~{extra} \
-      --log-level ~{log_level} \
+    pbsv discover \
+      --hifi \
+      --min-mapq 20 \
       --region ~{region} \
       --tandem-repeats ~{tr_bed} \
       ~{region}.xml \
@@ -160,7 +157,7 @@ task pbsv_discover_by_region {
 
 task pbsv_call_by_region {
   meta {
-    description: "Calls SVs for a given region from SV signatures in single samples or jointly call in sample set."
+    description: "Call structural variants from SV signatures and assign genotypes (SVSIG to VCF)."
   }
 
   parameter_meta {
@@ -171,8 +168,6 @@ task pbsv_call_by_region {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     region: { help: "Region of the genome to call structural variants, e.g. chr1." }
-    extra: { help: "Extra parameters to pass to pbsv." }
-    log_level: { help: "Log level." }
     output_filename: { help: "Name of the output VCF file." }
     threads: { help: "Number of threads to be used." }
 
@@ -187,8 +182,6 @@ task pbsv_call_by_region {
     File reference_fasta
     File reference_index
     String region
-    String extra = "--hifi -m 20"
-    String log_level = "INFO"
     String output_filename = "~{sample_name}.~{reference_name}.~{region}.pbsv.vcf"
     Int threads = 8
   }
@@ -205,8 +198,12 @@ task pbsv_call_by_region {
       fi
     done
 
-    pbsv call ~{extra} \
-      --log-level ~{log_level} \
+    pbsv call \
+      --hifi \
+      --min-sv-length 30 \
+      --call-min-reads-all-samples 2 \
+      --call-min-reads-one-sample 2 \
+      --call-min-read-perc-one-sample 10 \
       --num-threads ~{threads} \
       ~{reference_fasta} \
       ~{sep=" " svsigs} \

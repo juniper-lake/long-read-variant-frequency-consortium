@@ -90,12 +90,17 @@ task svim_alignment {
     String output_directory = "~{sample_name}_~{reference_name}"
   }
 
-  Float multiplier = 2.5
-  Int disk_size = ceil(multiplier * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
+  Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
   command {
     set -o pipefail
-    svim alignment ~{output_directory} ~{bam} ~{reference_fasta}
+    svim alignment \
+      --min_sv_size 30 \
+      --min_mapq 20 \
+      --minimum_depth 2 \
+      ~{output_directory} \
+      ~{bam} \
+      ~{reference_fasta}
   }
 
   output {

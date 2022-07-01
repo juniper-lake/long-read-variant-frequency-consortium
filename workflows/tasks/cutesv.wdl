@@ -69,11 +69,6 @@ task cutesv {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     output_vcf: { help: "Filename for output VCF." }
-    work_dir: { help: "Workign directory for the job." }
-    max_cluster_bias_INS: { help: "Maximum distance to cluster read together for insertion." }
-    max_cluster_bias_DEL: { help: "Maximum distance to cluster read together for deletion." }
-    diff_ratio_merging_INS: { help: "Do not merge breakpoints with basepair identity more than the ratio of default for insertion." }
-    diff_ratio_merging_DEL: { help: "Do not merge breakpoints with basepair identity more than the ratio of default for deletion." }
     threads: { help: "Number of threads to be used." }
 
     # outputs
@@ -88,11 +83,6 @@ task cutesv {
     File reference_fasta
     File reference_index
     String output_vcf = "~{sample_name}.~{reference_name}.vcf"
-    String work_dir = "."
-    Int max_cluster_bias_INS = 1000
-    Float diff_ratio_merging_INS = 0.9
-    Int max_cluster_bias_DEL = 1000
-    Float diff_ratio_merging_DEL = 0.5
     Int threads = 16
   }
 
@@ -103,11 +93,15 @@ task cutesv {
     set -o pipefail
     cuteSV \
       --threads ~{threads} \
-      --max_cluster_bias_INS ~{max_cluster_bias_INS} \
-      --diff_ratio_merging_INS ~{diff_ratio_merging_INS} \
-      --max_cluster_bias_DEL ~{max_cluster_bias_DEL} \
-      --diff_ratio_merging_DEL ~{diff_ratio_merging_DEL} \
-      ~{bam} ~{reference_fasta} ~{output_vcf} ~{work_dir}
+      --genotype \
+      --min_size 30 \
+      --min_mapq 20 \
+      --min_support 2 \
+      --max_cluster_bias_INS 1000 \
+      --diff_ratio_merging_INS 0.9 \
+      --max_cluster_bias_DEL 1000 \
+      --diff_ratio_merging_DEL 0.5 \
+      ~{bam} ~{reference_fasta} ~{output_vcf} "./"
   }
 
   output {

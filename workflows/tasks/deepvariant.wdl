@@ -13,7 +13,6 @@ workflow run_deepvariant {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    deepvariant_image: { help: "Docker image for Google's DeepVariant." }
 
     # outputs
     vcf: { description: "Small variant calls output by DeepVariant." }
@@ -27,7 +26,6 @@ workflow run_deepvariant {
     String reference_name
     File reference_fasta
     File reference_index
-    String deepvariant_image
   }
 
   call deepvariant {
@@ -38,7 +36,6 @@ workflow run_deepvariant {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      deepvariant_image = deepvariant_image
   }
 
   output {
@@ -64,7 +61,6 @@ task deepvariant {
     model_type: { help: "One of the following [WGS,WES,PACBIO,HYBRID_PACBIO_ILLUMINA]." }
     output_vcf: { help: "Filename for the output VCF file." }
     threads: { help: "Number of threads to be used." }
-    deepvariant_image: { help: "Docker image for Google's DeepVariant." }
 
     # outputs
     vcf: { description: "Small variant calls output by DeepVariant." }
@@ -81,7 +77,6 @@ task deepvariant {
     String model_type = "PACBIO"
     String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
     Int threads = 64
-    String deepvariant_image
   }
   
   Float disk_multiplier = 3.25
@@ -108,6 +103,6 @@ task deepvariant {
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
-    docker: deepvariant_image
+    docker: "google/deepvariant:1.4.0"
   }
 }

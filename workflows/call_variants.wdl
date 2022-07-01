@@ -27,7 +27,6 @@ workflow call_variants {
     reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats for reference genome." }
     regions: { help: "Array of regions to call variants in, used for parallel processing of genome." }
-    deepvariant_image: { help: "Docker image for Google's DeepVariant (single-pass optimized)." }
   }
 
   input {
@@ -38,7 +37,6 @@ workflow call_variants {
     File reference_index
     File tr_bed
     Array[String] regions
-    String deepvariant_image
   }
 
   # align all hifi reads associated with sample to reference with pbmm2
@@ -80,7 +78,6 @@ workflow call_variants {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
-      deepvariant_image = deepvariant_image
   }
 
   # if movies includes bams, convert to fasta

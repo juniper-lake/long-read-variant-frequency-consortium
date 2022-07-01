@@ -7,19 +7,19 @@ workflow run_hifiasm {
 
   parameter_meta {
     sample_name: { help: "Name of sample, used for file naming." }
-    movies: { help: "Array of HiFi movie files in FASTA/FASTQ format." }
+    movie_fastxs: { help: "Array of HiFi movie files in FASTA/FASTQ format." }
   }
 
   input {
     String sample_name
-    Array[File] movies
+    Array[File] movie_fastxs
   }
   
   # assemble HiFi reads
   call hifiasm_assemble {
     input:
       sample_name = sample_name,
-      movies = movies,
+      movie_fastxs = movie_fastxs,
   }
   
   # convert hap1 from gfa to fasta
@@ -61,7 +61,7 @@ task hifiasm_assemble {
   parameter_meta {
     # inputs
     sample_name: { help: "Name of sample, used for file naming." }
-    movies: { help: "Array of HiFi movie files in FASTA/FASTQ format." }
+    movie_fastxs: { help: "Array of HiFi movie files in FASTA/FASTQ format." }
     output_prefix: { help: "Prefix for output files." }
     threads: { help: "Number of threads to use." }
 
@@ -72,18 +72,18 @@ task hifiasm_assemble {
 
   input {
     String sample_name
-    Array[File] movies
+    Array[File] movie_fastxs
     String output_prefix = "~{sample_name}.asm"
     Int threads = 48
   }
 
   Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(movies, "GB")) + 20
+  Int disk_size = ceil(multiplier * size(movie_fastxs, "GB")) + 20
   Int memory = threads * 3
   
   command {
     set -o pipefail
-    hifiasm -o ~{output_prefix} -t ~{threads} ~{sep=" " movies}
+    hifiasm -o ~{output_prefix} -t ~{threads} ~{sep=" " movie_fastxs}
   }
 
   output {
@@ -118,7 +118,7 @@ task gfa2fa {
   }
   input {
     File gfa
-    String output_filename = "~{basename(gfa, '.bam')}.fasta"
+    String output_filename = "~{basename(gfa, '.gfa')}.fasta"
     Int threads = 4
   }
 

@@ -7,11 +7,11 @@ workflow run_minimap2 {
 
   parameter_meta {
     # inputs
+    sample_name: { help: "Prefix for output files." }
+    movies: { help: "Array of FASTQ files to be aligned." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    movies: { help: "Array of FASTQ files to be aligned." }
-    output_prefix: { help: "Prefix for output files." }
 
     # outputs
     bam: { description: "Output BAM filename." }
@@ -19,20 +19,20 @@ workflow run_minimap2 {
   }
 
   input {
+    String sample_name
+    Array[File] movies
     String reference_name
     File reference_fasta
     File reference_index
-    Array[File] movies
-    String output_prefix
   }
 
   call minimap2 {
     input: 
+    sample_name = sample_name,
+    movies = movies,
     reference_name = reference_name,
     reference_fasta = reference_fasta,
     reference_index = reference_index,
-    movies = movies,
-    output_prefix = output_prefix,
   }
 
   output {
@@ -49,11 +49,11 @@ task minimap2 {
 
   parameter_meta {
     # inputs
+    sample_name: { help: "Name of the sample." }
+    movies: { help: "Array of FASTQ files to be aligned." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    movies: { help: "Array of FASTQ files to be aligned." }
-    output_prefix: { help: "Prefix for output files." }
     output_bam: { help: "Output BAM filename." }
     samtools_threads: { help: "Number of threads to use for SAMtools in addition to main thread." }
     minimap_threads: { help: "Number of threads to use for minimap2." }
@@ -64,12 +64,12 @@ task minimap2 {
   }
   
   input {
+    String sample_name
+    Array[File] movies
     String reference_name
     File reference_fasta
     File reference_index
-    Array[File] movies
-    String output_prefix
-    String output_bam = "~{output_prefix}.~{reference_name}.bam"
+    String output_bam = "~{sample_name}.~{reference_name}.bam"
     Int samtools_threads = 3
     Int minimap_threads = 24
   }

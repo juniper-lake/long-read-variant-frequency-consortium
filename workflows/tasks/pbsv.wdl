@@ -10,12 +10,12 @@ workflow run_pbsv {
   parameter_meta {
     # inputs
     sample_name: { help: "Name of the sample." }
-    regions: { help: "Array of regions of the genome to search for SV signatures, e.g. chr1." }
     bams: { help: "Array of aligned BAM files." }
     bais: { help: "Array of bam BAI indexes."}
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
+    regions: { help: "Array of regions of the genome to search for SV signatures, e.g. chr1." }
     tr_bed: { help: "BED file containing known tandem repeats." }
 
     # outputs
@@ -24,12 +24,12 @@ workflow run_pbsv {
 
   input {
     String sample_name
-    Array[String] regions
     Array[File] bams
     Array[File] bais
     String reference_name
     File reference_fasta
     File reference_index
+    Array[String] regions
     File tr_bed
   }
 
@@ -38,9 +38,9 @@ workflow run_pbsv {
     call pbsv_discover_by_region {
       input:
         sample_name = sample_name,
-        region = regions[idx],
         bams = bams,
         bais = bais,
+        region = regions[idx],
         tr_bed = tr_bed,
     }
     

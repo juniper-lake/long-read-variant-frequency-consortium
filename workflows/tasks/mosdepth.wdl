@@ -7,7 +7,7 @@ workflow run_mosdepth {
 
   parameter_meta {
     # inputs
-    bams: { help: "Array of BAM files." }
+    bams: { help: "Array of aligned BAM files." }
     bais: { help: "Array of BAM index files." }
 
     # outputs

@@ -37,9 +37,9 @@ workflow call_variants {
     String reference_name
     File reference_fasta
     File reference_index
+    Array[String] regions
     File tr_bed
     File sites_vcf
-    Array[String] regions
   }
 
   # align all hifi reads associated with sample to reference with pbmm2
@@ -104,8 +104,8 @@ workflow call_variants {
   # run minimap2
   call minimap2.run_minimap2 {
     input:
-      output_prefix = sample_name,
-      movies = convert_to_fasta.fastas,
+      sample_name = sample_name,
+      movies = convert_to_fasta.fastxs,
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
@@ -149,7 +149,7 @@ workflow call_variants {
   call hifiasm.run_hifiasm {
     input:
       sample_name = sample_name,
-      movies = convert_to_fasta.fastas,
+      movie_fastxs = convert_to_fasta.fastxs,
   }
 
   # call variants from phased assemblies with pav

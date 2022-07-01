@@ -14,7 +14,6 @@ workflow run_somalier {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     sites_vcf: { help: "List of known polymorphic sites provided by somalier." }
-    threads: { help: "Number of threads to be used." }
 
     # outputs
     groups: { description: "Multi-sample group relatedness." }

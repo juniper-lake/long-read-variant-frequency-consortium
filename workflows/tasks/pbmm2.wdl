@@ -21,11 +21,11 @@ workflow run_pbmm2 {
   }
 
   input {
+    String sample_name
+    Array[File] movies
     String reference_name
     File reference_fasta
     File reference_index
-    Array[File] movies
-    String sample_name
   }
   
   scatter (idx in range(length(movies))) { 

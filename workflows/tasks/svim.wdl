@@ -36,7 +36,6 @@ workflow run_svim {
       sample_name = sample_name,
       bam = bam,
       bai = bai,
-      reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
   }
@@ -71,10 +70,8 @@ task svim_alignment {
     sample_name: { help: "Name of the sample." }
     bam: { help: "BAM file of aligned reads." }
     bai: { help: "BAM index file." }
-    reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    output_directory: { help: "Name of output VCF." }
 
     # outputs
     vcf: { description: "VCF with structural variants called by SVIM." }
@@ -84,7 +81,6 @@ task svim_alignment {
     String sample_name
     File bam
     File bai
-    String reference_name
     File reference_fasta
     File reference_index
   }
@@ -94,7 +90,7 @@ task svim_alignment {
   command {
     set -o pipefail
     svim alignment \
-      --sample ~{sample_name}_svim
+      --sample ~{sample_name}_svim \
       --min_sv_size 30 \
       --min_mapq 20 \
       --minimum_depth 2 \

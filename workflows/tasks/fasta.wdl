@@ -10,7 +10,7 @@ workflow convert_to_fasta {
     movies: { help: "Array of movies." }
 
     # outputs
-    fastas: { help: "Array of FASTA/FASTQ files." }
+    fastxs: { help: "Array of FASTA/FASTQ files." }
   }
 
   input {
@@ -42,7 +42,7 @@ workflow convert_to_fasta {
   }
 
   output {
-    Array[File] fastas = flatten([select_all(ubam_to_fasta.fasta), select_all(do_nothing.output_file)])
+    Array[File] fastxs = flatten([select_all(ubam_to_fasta.fasta), select_all(do_nothing.output_file)])
   }
 }
 

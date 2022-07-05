@@ -7,9 +7,6 @@ WORKDIR /src
 ARG TOOL
 ARG VERSION
 
-# Update conda version
-RUN conda update -n base -c defaults conda
-
 # Create environment and add to path
 COPY ./dockers/envs/${TOOL}_${VERSION}.yaml ./
 RUN conda env create --file ${TOOL}_${VERSION}.yaml --name ${TOOL}

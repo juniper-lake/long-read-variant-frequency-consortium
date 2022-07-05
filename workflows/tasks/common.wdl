@@ -40,7 +40,6 @@ task sort_vcf {
     # inputs
     input_vcf: { help: "VCF file to be sorted." }
     output_filename: { help: "Output filename." }
-    docker_image: { help: "Docker image with bcftools." }
 
     # outputs
     vcf: { description: "Gzipped and indexed VCF file." }

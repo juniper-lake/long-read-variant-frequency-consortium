@@ -58,7 +58,6 @@ task deepvariant {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    model_type: { help: "One of the following [WGS,WES,PACBIO,HYBRID_PACBIO_ILLUMINA]." }
     output_vcf: { help: "Filename for the output VCF file." }
     threads: { help: "Number of threads to be used." }
 

@@ -102,7 +102,7 @@ task ubam_to_fasta {
   
   input {
     File movie
-    String movie_name = basename(basename(basename(movie, ".bam"), ".hifi_reads"), ".ccs")
+    String movie_name = sub(basename(movie), "\..*", "")
     String output_fasta = "~{movie_name}.fasta"
     Int threads = 4
     Int threads_m1 = threads - 1

@@ -1,7 +1,5 @@
 version 1.0
 
-import "common.wdl" as common
-
 workflow run_pbmm2 {
   meta {
     description: "Align array of movies using pbmm2."
@@ -28,13 +26,7 @@ workflow run_pbmm2 {
     File reference_index
   }
   
-  scatter (idx in range(length(movies))) { 
-    # for each movie, get the movie name for file naming
-    call common.get_movie_name {
-      input:
-        movie = movies[idx],
-    }
-    
+  scatter (idx in range(length(movies))) {     
     # align each movie with pbmm2
     call pbmm2_align {
         input: 
@@ -42,7 +34,6 @@ workflow run_pbmm2 {
           reference_fasta = reference_fasta,
           reference_index = reference_index,
           movie = movies[idx],
-          movie_name = get_movie_name.movie_name,
           sample_name = sample_name,
     }
   }
@@ -85,13 +76,8 @@ task pbmm2_align {
     File reference_fasta
     File reference_index
     File movie
-    String movie_name
     String sample_name
-    String preset_option = "CCS"
-    String log_level = "INFO"
-    String extra = "-c 0 -y 70"
-    Boolean unmapped = true
-    Boolean sort = true
+    String movie_name = basename(basename(basename(basename(movie, ".bam"), ".fastq"), ".hifi_reads"), ".ccs")
     String output_bam = "~{movie_name}.~{reference_name}.bam"
     Int threads = 24
     }
@@ -103,11 +89,11 @@ task pbmm2_align {
     set -o pipefail
     pbmm2 align \
       --sample ~{sample_name} \
-      --log-level ~{log_level} \
-      --preset ~{preset_option} \
-      ~{true="--sort" false="" sort} \
-      ~{true="--unmapped" false="" unmapped} \
-      ~{extra} \
+      --log-level INFO \
+      --preset CCS \
+      --sort \
+      --unmapped \
+      -c 0 -y 70 \
       -j ~{threads} \
       ~{reference_fasta} \
       ~{movie} \

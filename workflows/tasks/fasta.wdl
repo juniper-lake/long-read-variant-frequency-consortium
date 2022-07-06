@@ -65,7 +65,7 @@ task check_if_ubam {
   }
 
   command {
-    if [[ ~{basename(movie)} == *.bam ]]; then
+    if [[ $(basename ~{movie}) == *.bam ]]; then
       echo "true"
     else
       echo "false"
@@ -108,8 +108,7 @@ task ubam_to_fasta {
     Int threads_m1 = threads - 1
   }
   
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(movie, "GB")) + 20
+  Int disk_size = ceil(3.25 * size(movie, "GB")) + 20
 
   command {
     set -o pipefail
@@ -142,7 +141,6 @@ task do_nothing {
 
     # outputs
     output_file: { description: "Output file." }
-    output_string: { description: "Output string." }
   }
 
   input {

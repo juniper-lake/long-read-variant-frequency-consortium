@@ -1,36 +1,5 @@
 version 1.0
 
-
-task get_movie_name {
-  meta {
-    description: "Gets the name of a movie from the filename, i.e. everything before the first '.'"
-  }
-
-  parameter_meta {
-    movie: { help: "The movie file path to get the name of." }
-  }
-
-  input {
-    File movie
-  }
-
-  command<<<
-    FILE="~{basename(movie)}"
-    echo "${FILE%%.*}"
-  >>>
-
-  output {
-    String movie_name = read_string(stdout())
-  }
-
-  runtime {
-    maxRetries: 3
-    preemptible: 1
-    docker: "ubuntu:20.04"
-  }
-}
-
-
 task sort_vcf {
   meta {
     description: "Sorts a vcf file."
@@ -47,11 +16,10 @@ task sort_vcf {
 
   input {
     File input_vcf
-    String output_filename = "~{basename(input_vcf)}_sorted.vcf"
+    String output_filename
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(input_vcf, "GB")) + 20
+  Int disk_size = ceil(3.25 * size(input_vcf, "GB")) + 20
 
   command {
     set -o pipefail
@@ -96,8 +64,7 @@ task zip_and_index_vcf {
     Int threads = 2
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(input_vcf, "GB")) + 20
+  Int disk_size = ceil(3.25 * size(input_vcf, "GB")) + 20
 
   command {
     set -o pipefail

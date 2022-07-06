@@ -27,7 +27,7 @@ workflow run_mosdepth {
     call mosdepth {
       input:
         bam = bams[idx],
-        bai = bais[idx]
+        bai = bais[idx],
     }
   }
 
@@ -55,6 +55,7 @@ task mosdepth {
     # inputs
     bam: { help: "BAM file of aligned reads." }
     bai: { help: "BAM index file." }
+    output_prefix: { help: "Prefix for output files." }
 
     # outputs
     global_dist: { description: "Text file containing cumulative distribution indicating the proportion of total bases covered for at least a given coverage value." }
@@ -65,19 +66,19 @@ task mosdepth {
   input {
     File bam
     File bai
-    String prefix = basename(bam, ".bam")
+    String output_prefix = basename(bam, ".bam")
     Int threads = 4
   }
 
   command <<<
     set -o pipefail
-    mosdepth --threads ~{threads} "--no-per-base" ~{prefix} ~{bam}
-    awk '$1=="total_region" { print $4 }' ~{prefix}.mosdepth.summary.txt > mean_coverage.txt
+    mosdepth --threads ~{threads} "--no-per-base" ~{output_prefix} ~{bam}
+    awk '$1=="total_region" { print $4 }' ~{output_prefix}.mosdepth.summary.txt > mean_coverage.txt
   >>>
 
   output {
-    File global_dist = "~{prefix}.mosdepth.global.dist.txt"
-    File summary = "~{prefix}.mosdepth.summary.txt"
+    File global_dist = "~{output_prefix}.mosdepth.global.dist.txt"
+    File summary = "~{output_prefix}.mosdepth.summary.txt"
     Float coverage = read_float("mean_coverage.txt")
   }
 

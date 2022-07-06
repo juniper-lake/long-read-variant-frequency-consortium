@@ -56,7 +56,7 @@ workflow call_variants {
   call mosdepth.run_mosdepth {
     input:
       bams = run_pbmm2.bams,
-      bais = run_pbmm2.bais
+      bais = run_pbmm2.bais,
   }
 
   # check sample swaps

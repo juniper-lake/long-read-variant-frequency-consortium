@@ -12,10 +12,8 @@ workflow get_sample_movies {
     sample_sheet: { help: "TSV (.txt or .tsv) with single line header including columns: sample_name, cohort_name, movie_path"}
     sample_name: { help: "Name of the sample."}
 
-    # outpus
+    # outputs
     movie_paths: { description: "Array of movie paths." }
-    movie_names: { description: "Array of movie names." }
-    is_ubams: { description: "Array of strings indicating if the movie is a ubam." }
   }
 
   input {

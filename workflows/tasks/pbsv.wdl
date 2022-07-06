@@ -237,7 +237,6 @@ task concat_pbsv_vcfs {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     input_vcfs: { help: "VCF files to be concatenated." }
     input_indexes: { help: "Index files for VCFs." }
-    extra: { help: "Extra parameters to pass to bcftools." }
     output_filename: { help: "Name of the output VCF file." }
     threads: { help: "Number of threads to be used." }
 
@@ -250,7 +249,6 @@ task concat_pbsv_vcfs {
     String reference_name
     Array[File] input_vcfs
     Array[File] input_indexes
-    String extra = "--allow-overlaps"
     String output_filename = "~{sample_name}.~{reference_name}.pbsv.vcf"
     Int threads = 4
   }
@@ -260,7 +258,7 @@ task concat_pbsv_vcfs {
 
   command {
     set -o pipefail
-    bcftools concat ~{extra} \
+    bcftools concat --allow-overlaps \
       --output ~{output_filename} \
       ~{sep=" " input_vcfs} \
   }

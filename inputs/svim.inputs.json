@@ -1,8 +1,10 @@
 {
-    "sample_name": "HG002",
-    "bam": "HG002.GRCh38_no_alt.bam",
-    "bai": "HG002.GRCh38_no_alt.bam.bai",
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai"
+  "run_svim.reference_fasta": "File",
+  "run_svim.bam": "File",
+  "run_svim.reference_index": "File",
+  "run_svim.sample_name": "String",
+  "run_svim.bai": "File",
+  "run_svim.reference_name": "String",
+  "run_svim.zip_and_index_vcf.output_filename": "String? (optional)",
+  "run_svim.zip_and_index_vcf.threads": "Int (optional, default = 2)"
 }

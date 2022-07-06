@@ -1,8 +1,12 @@
 {
-    "sample_name": "HG002",
-    "bam": "HG002.GRCh38_no_alt.bam",
-    "bai": "HG002.GRCh38_no_alt.bam.bai",
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai"
+  "run_cutesv.zip_and_index_vcf.threads": "Int (optional, default = 2)",
+  "run_cutesv.reference_name": "String",
+  "run_cutesv.cutesv.output_vcf": "String? (optional)",
+  "run_cutesv.reference_fasta": "File",
+  "run_cutesv.zip_and_index_vcf.output_filename": "String? (optional)",
+  "run_cutesv.bai": "File",
+  "run_cutesv.cutesv.threads": "Int (optional, default = 16)",
+  "run_cutesv.reference_index": "File",
+  "run_cutesv.bam": "File",
+  "run_cutesv.sample_name": "String"
 }

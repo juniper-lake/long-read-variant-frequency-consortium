@@ -48,7 +48,6 @@ task zip_and_index_vcf {
   parameter_meta {
     # inputs
     input_vcf: { help: "VCF file to be gzipped and indexed." }
-    tabix_extra: { help: "Extra arguments for tabix." }
     output_filename: { help: "Output filename." }
     threads: { help: "Number of threads to use." }
 
@@ -59,7 +58,6 @@ task zip_and_index_vcf {
 
   input {
     File input_vcf
-    String tabix_extra = "--preset vcf"
     String output_filename = "~{basename(input_vcf)}.gz"
     Int threads = 2
   }
@@ -69,7 +67,7 @@ task zip_and_index_vcf {
   command {
     set -o pipefail
     bgzip --threads ~{threads} ~{input_vcf} -c > ~{output_filename}
-    tabix ~{tabix_extra} ~{output_filename}
+    tabix --preset vcf ~{output_filename}
   }
 
   output {

@@ -1,9 +1,11 @@
 {
-    "sample_name": "HG002",
-    "bam": "HG002.GRCh38_no_alt.bam",
-    "bai": "HG002.GRCh38_no_alt.bam.bai",
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai",
-    "tr_bed": "human_GRCh38_no_alt_analysis_set.trf.bed"
+  "run_sniffles.reference_index": "File",
+  "run_sniffles.reference_name": "String",
+  "run_sniffles.sample_name": "String",
+  "run_sniffles.sniffles.output_vcf": "String? (optional)",
+  "run_sniffles.reference_fasta": "File",
+  "run_sniffles.bam": "File",
+  "run_sniffles.bai": "File",
+  "run_sniffles.tr_bed": "File",
+  "run_sniffles.sniffles.threads": "Int (optional, default = 8)"
 }

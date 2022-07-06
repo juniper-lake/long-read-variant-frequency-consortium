@@ -1,8 +1,10 @@
 {
-    "sample_name": "HG002",
-    "bams": ["movie1.GRCh38_no_alt.bam", "movie2.GRCh38_no_alt.bam"],
-    "bais": ["movie1.GRCh38_no_alt.bam.bai", "movie2.GRCh38_no_alt.bam.bai"],
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai"
+  "run_deepvariant.sample_name": "String",
+  "run_deepvariant.deepvariant.output_vcf": "String? (optional)",
+  "run_deepvariant.reference_fasta": "File",
+  "run_deepvariant.deepvariant.threads": "Int (optional, default = 64)",
+  "run_deepvariant.reference_name": "String",
+  "run_deepvariant.reference_index": "File",
+  "run_deepvariant.bais": "Array[File]",
+  "run_deepvariant.bams": "Array[File]"
 }

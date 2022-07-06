@@ -1,0 +1,4 @@
+{
+  "get_sample_movies.sample_name": "String",
+  "get_sample_movies.sample_sheet": "File"
+}

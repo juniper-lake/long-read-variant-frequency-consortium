@@ -1,3 +1,7 @@
 {
-    "movies": ["movie1.ccs.bam", "movie2.ccs.bam"]
+  "convert_to_fasta.ubam_to_fasta.output_fasta": "String? (optional)",
+  "convert_to_fasta.ubam_to_fasta.movie_name": "String? (optional)",
+  "convert_to_fasta.ubam_to_fasta.threads_m1": "Int? (optional)",
+  "convert_to_fasta.movies": "Array[File]",
+  "convert_to_fasta.ubam_to_fasta.threads": "Int (optional, default = 4)"
 }

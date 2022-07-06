@@ -1,10 +1,20 @@
 {
-    "sample_name": "HG002",
-    "bams": ["movie1.GRCh38_no_alt.bam", "movie2.GRCh38_no_alt.bam"],
-    "bais": ["movie1.GRCh38_no_alt.bam.bai", "movie2.GRCh38_no_alt.bam.bai"],
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai",
-    "regions": [ "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX", "chrY", "chrM" ],
-    "tr_bed": "human_GRCh38_no_alt_analysis_set.trf.bed"
+  "run_pbsv.bais": "Array[File]",
+  "run_pbsv.pbsv_call_by_region.output_filename": "String? (optional)",
+  "run_pbsv.sample_name": "String",
+  "run_pbsv.pbsv_discover_by_region.svsig_filename": "String? (optional)",
+  "run_pbsv.zip_and_index_final_vcf.threads": "Int (optional, default = 2)",
+  "run_pbsv.zip_and_index_vcf.output_filename": "String? (optional)",
+  "run_pbsv.reference_index": "File",
+  "run_pbsv.reference_name": "String",
+  "run_pbsv.reference_fasta": "File",
+  "run_pbsv.pbsv_discover_by_region.threads": "Int (optional, default = 4)",
+  "run_pbsv.zip_and_index_vcf.threads": "Int (optional, default = 2)",
+  "run_pbsv.bams": "Array[File]",
+  "run_pbsv.pbsv_call_by_region.threads": "Int (optional, default = 8)",
+  "run_pbsv.tr_bed": "File",
+  "run_pbsv.concat_pbsv_vcfs.output_filename": "String? (optional)",
+  "run_pbsv.regions": "Array[String]",
+  "run_pbsv.concat_pbsv_vcfs.threads": "Int (optional, default = 4)",
+  "run_pbsv.zip_and_index_final_vcf.output_filename": "String? (optional)"
 }

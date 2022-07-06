@@ -74,7 +74,6 @@ task deepvariant {
     String reference_name
     File reference_fasta
     File reference_index
-    String model_type = "PACBIO"
     String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
     Int threads = 64
   }
@@ -85,7 +84,7 @@ task deepvariant {
   command {
     set -o pipefail
     /opt/deepvariant/bin/run_deepvariant \
-      --model_type=~{model_type} \
+      --model_type=PACBIO \
       --ref=~{reference_fasta} \
       --reads=~{sep="," bams} \
       --output_vcf=~{output_vcf} \

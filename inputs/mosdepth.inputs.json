@@ -1,4 +1,6 @@
 {
-    "bams": ["movie1.GRCh38_no_alt.bam", "movie2.GRCh38_no_alt.bam"],
-    "bais": ["movie1.GRCh38_no_alt.bam.bai", "movie2.GRCh38_no_alt.bam.bai"]
+  "run_mosdepth.mosdepth.threads": "Int (optional, default = 4)",
+  "run_mosdepth.mosdepth.output_prefix": "String? (optional)",
+  "run_mosdepth.bais": "Array[File]",
+  "run_mosdepth.bams": "Array[File]"
 }

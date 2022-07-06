@@ -1,7 +1,10 @@
 {
-    "sample_name": "HG002",
-    "movies": ["movie1.ccs.bam", "movie2.ccs.bam"],
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai"
+  "run_pbmm2.reference_index": "File",
+  "run_pbmm2.pbmm2_align.output_bam": "String? (optional)",
+  "run_pbmm2.pbmm2_align.movie_name": "String? (optional)",
+  "run_pbmm2.reference_name": "String",
+  "run_pbmm2.reference_fasta": "File",
+  "run_pbmm2.movies": "Array[File]",
+  "run_pbmm2.sample_name": "String",
+  "run_pbmm2.pbmm2_align.threads": "Int (optional, default = 24)"
 }

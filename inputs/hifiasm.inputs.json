@@ -1,4 +1,14 @@
 {
-    "sample_name": "HG002",
-    "movie_fastxs": ["movie1.fastq", "movie2.fasta"]
+  "run_hifiasm.movie_fastxs": "Array[File]",
+  "run_hifiasm.gfa2fa_hap1.threads": "Int (optional, default = 4)",
+  "run_hifiasm.sample_name": "String",
+  "run_hifiasm.gfa2fa_hap2.output_filename": "String? (optional)",
+  "run_hifiasm.gfa2fa_hap1.output_filename": "String? (optional)",
+  "run_hifiasm.bgzip_hap2.threads": "Int (optional, default = 4)",
+  "run_hifiasm.hifiasm_assemble.output_prefix": "String? (optional)",
+  "run_hifiasm.hifiasm_assemble.threads": "Int (optional, default = 48)",
+  "run_hifiasm.gfa2fa_hap2.threads": "Int (optional, default = 4)",
+  "run_hifiasm.bgzip_hap1.output_filename": "String? (optional)",
+  "run_hifiasm.bgzip_hap2.output_filename": "String? (optional)",
+  "run_hifiasm.bgzip_hap1.threads": "Int (optional, default = 4)"
 }

@@ -1,10 +1,10 @@
 {
-    "sample_name": "HG002",
-    "hifi_reads": ["movie1.ccs.bam", "movie2.ccs.bam"],
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai",
-    "regions": [ "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX", "chrY", "chrM" ],
-    "tr_bed": "human_GRCh38_no_alt_analysis_set.trf.bed",
-    "sites_vcf": "sites.hg38.vcf.gz"
+  "call_variants.regions": "Array[String]",
+  "call_variants.reference_fasta": "File",
+  "call_variants.hifi_reads": "Array[File]",
+  "call_variants.reference_index": "File",
+  "call_variants.sites_vcf": "File",
+  "call_variants.sample_name": "String",
+  "call_variants.tr_bed": "File",
+  "call_variants.reference_name": "String"
 }

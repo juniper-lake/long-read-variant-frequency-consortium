@@ -1,7 +1,10 @@
 {
-    "sample_name": "HG002",
-    "movies": ["movie1.ccs.bam", "movie2.ccs.bam"],
-    "reference_name": "GRCh38_no_alt", 
-    "reference_fasta": "human_GRCh38_no_alt_analysis_set.fasta", 
-    "reference_index": "human_GRCh38_no_alt_analysis_set.fasta.fai"
+  "run_minimap2.minimap2.output_bam": "String? (optional)",
+  "run_minimap2.minimap2.samtools_threads": "Int (optional, default = 3)",
+  "run_minimap2.reference_name": "String",
+  "run_minimap2.minimap2.minimap_threads": "Int (optional, default = 24)",
+  "run_minimap2.sample_name": "String",
+  "run_minimap2.reference_index": "File",
+  "run_minimap2.reference_fasta": "File",
+  "run_minimap2.movies": "Array[File]"
 }

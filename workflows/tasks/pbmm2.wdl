@@ -72,7 +72,7 @@ task pbmm2_align {
     File reference_index
     File movie
     String sample_name
-    String movie_name = basename(basename(basename(basename(movie, ".bam"), ".fastq"), ".hifi_reads"), ".ccs")
+    String movie_name = sub(basename(movie), "\..*", "")
     String output_bam = "~{movie_name}.~{reference_name}.bam"
     Int threads = 24
     }

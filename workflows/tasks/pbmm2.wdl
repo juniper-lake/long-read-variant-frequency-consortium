@@ -58,11 +58,6 @@ task pbmm2_align {
     movie: { help: "An BAM or FASTQ file containing HiFi reads." }
     movie_name: { help: "Name of the HiFi reads movie, used for file labeling." }
     sample_name: { help: "Name of the sample." }
-    preset_option: { help: "This option applies multiple options at the same time." }
-    log_level: { help: "Log level of pbmm2." }
-    extra: { help: "Additional pbmm2 options." }
-    unmapped: { help: "If true, unmapped reads are added to the output BAM file." }
-    sort: { help: "If true, will sort the output bam file." }
     output_bam: { help: "Name of the output bam file." }
     threads: { help: "Number of threads to be used." }
 

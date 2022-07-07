@@ -1,5 +1,7 @@
 version 1.0
 
+import "common.wdl" as common
+
 workflow convert_to_fasta {
   meta {
     description: "Given an array of movies, convert any BAMs to FASTA."
@@ -28,7 +30,12 @@ workflow convert_to_fasta {
     if (check_if_ubam.is_ubam) {
       call ubam_to_fasta {
         input:
-        movie = movies[idx],
+          movie = movies[idx],
+      }
+
+      call common.bgzip_fasta {
+        input:
+          fasta = ubam_to_fasta.fasta
       }
     }  
 
@@ -42,7 +49,7 @@ workflow convert_to_fasta {
   }
 
   output {
-    Array[File] fastxs = flatten([select_all(ubam_to_fasta.fasta), select_all(do_nothing.output_file)])
+    Array[File] fastxs = flatten([select_all(bgzip_fasta.gzipped_fasta), select_all(do_nothing.output_file)])
   }
 }
 

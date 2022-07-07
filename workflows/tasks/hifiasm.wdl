@@ -1,5 +1,7 @@
 version 1.0
 
+import "common.wdl" as common
+
 workflow run_hifiasm {
   meta {
     description: "Assemble HiFi reads and convert to zipped FASTA."
@@ -35,13 +37,13 @@ workflow run_hifiasm {
   }
 
   # zip hap1 fasta
-  call bgzip_fasta as bgzip_hap1 {
+  call common.bgzip_fasta as bgzip_hap1 {
     input:
       fasta = gfa2fa_hap1.fasta,
   }
 
   # zip hap2 fasta
-  call bgzip_fasta as bgzip_hap2 {
+  call common.bgzip_fasta as bgzip_hap2 {
     input:
       fasta = gfa2fa_hap2.fasta,
   }
@@ -139,48 +141,5 @@ task gfa2fa {
     maxRetries: 3
     preemptible: 1
     docker: "juniperlake/gfatools:0.4"
-  }
-}
-
-
-task bgzip_fasta {
-  meta {
-    description: "Zip FASTA file."
-  }
-
-  parameter_meta {
-    # inputs
-    fasta: { help: "FASTA file to zip." }
-    threads: { help: "Number of threads to use." }
-
-    # outputs
-    gzipped_fasta: { description: "Zipped FASTA file." }
-  }
-  
-  input {
-    File fasta
-    Int threads = 4
-  }
-
-  String output_filename = "~{basename(fasta)}.gz"
-  Int memory = 4 * threads
-  Int disk_size = ceil(3.25 * size(fasta, "GB")) + 20
-
-  command {
-    set -o pipefail
-    bgzip --threads ~{threads} ~{fasta} -c > ~{output_filename}
-  }
-
-  output {
-    File gzipped_fasta = output_filename
-  }
-
-  runtime {
-    cpu: threads
-    memory: "~{memory}GB"
-    disks: "local-disk ~{disk_size} HDD"
-    maxRetries: 3
-    preemptible: 1
-    docker: "juniperlake/htslib:1.14"
   }
 }

@@ -104,7 +104,6 @@ task sum_floats {
   parameter_meta {
     # inputs
     floats: { help: "An array of floats." }
-    threads: { help: "Number of threads to be used." }
 
     # outputs
     sum: {description: "The sum of all numbers in input array."}
@@ -113,7 +112,9 @@ task sum_floats {
   input {
     Array[Float] floats
   }
-
+  
+  Int threads = 1
+  Int memory = 2 * threads
   Int disk_size = 10
 
   command <<<

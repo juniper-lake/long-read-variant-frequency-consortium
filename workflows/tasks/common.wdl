@@ -87,3 +87,45 @@ task zip_and_index_vcf {
     docker: "juniperlake/htslib:1.14"
   }
 }
+
+task bgzip_fasta {
+  meta {
+    description: "Zip FASTA file."
+  }
+
+  parameter_meta {
+    # inputs
+    fasta: { help: "FASTA file to zip." }
+    threads: { help: "Number of threads to use." }
+
+    # outputs
+    gzipped_fasta: { description: "Zipped FASTA file." }
+  }
+  
+  input {
+    File fasta
+    Int threads = 4
+  }
+
+  String output_filename = "~{basename(fasta)}.gz"
+  Int memory = 4 * threads
+  Int disk_size = ceil(3.25 * size(fasta, "GB")) + 20
+
+  command {
+    set -o pipefail
+    bgzip --threads ~{threads} ~{fasta} -c > ~{output_filename}
+  }
+
+  output {
+    File gzipped_fasta = output_filename
+  }
+
+  runtime {
+    cpu: threads
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} HDD"
+    maxRetries: 3
+    preemptible: 1
+    docker: "juniperlake/htslib:1.14"
+  }
+}

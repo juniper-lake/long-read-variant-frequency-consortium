@@ -69,11 +69,11 @@ task minimap2 {
     File reference_fasta
     File reference_index
     String output_bam = "~{sample_name}.~{reference_name}.bam"
-    Int threads
+    Int threads = 24
   }
 
   Int samtools_threads = 3
-  Int minimap_threads = threads - samtools_threads - 1
+  Int minimap_threads = threads - ( samtools_threads + 1)
   Int memory = 4 * threads
   Int disk_size = ceil(2.5 * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movies, "GB"))) + 20
 

@@ -86,10 +86,10 @@ task somalier {
     File reference_fasta
     File reference_index
     File sites_vcf
-    Int threads = length(bams)
   }
 
   Int disk_size = ceil(1.5 * (size(bams, "GB") + size(reference_fasta, "GB"))) + 20
+  Int threads = length(bams)
   Int memory = 2 * threads
 
   command<<<

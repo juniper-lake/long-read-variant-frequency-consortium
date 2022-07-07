@@ -76,6 +76,7 @@ task pav {
     Int threads = 48
   }
 
+  Int memory = 2 * threads
   Int disk_size = ceil(3.25 * (size(hap1_fasta, "GB") + size(hap2_fasta, "GB") + size(reference_fasta, "GB"))) + 20
   
   command<<<
@@ -93,7 +94,7 @@ task pav {
 
   runtime {
     cpu: threads
-    memory: "32GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

@@ -75,6 +75,7 @@ task pbmm2_align {
 
   String movie_name = sub(basename(movie), "\\..*", "")
   String output_bam = "~{movie_name}.~{reference_name}.bam"
+  Int memory = 4 * threads
   Int disk_size = ceil(2.5 * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movie, "GB"))) + 20
   
   command {
@@ -99,7 +100,7 @@ task pbmm2_align {
 
   runtime {
     cpu: threads
-    memory: "96GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

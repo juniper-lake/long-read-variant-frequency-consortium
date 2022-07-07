@@ -60,6 +60,10 @@ task get_sample_sheet_values {
     String condition_value
     String column_out
   }
+  
+  Int threads = 1
+  Int memory = 4 * threads
+  Int disk_size = ceil(1.5 * size(sample_sheet, "GB")) + 10
 
   command {
     set -o pipefail
@@ -78,6 +82,9 @@ task get_sample_sheet_values {
   }
 
   runtime {
+    cpu: threads
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
     docker: "juniperlake/pandas:1.1.0"

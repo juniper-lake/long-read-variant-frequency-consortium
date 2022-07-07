@@ -77,6 +77,7 @@ task deepvariant {
     Int threads = 64
   }
   
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * (size(reference_fasta, "GB") + size(bams, "GB"))) + 20
 
   command {
@@ -96,7 +97,7 @@ task deepvariant {
 
   runtime {
     cpu: threads
-    memory: "256GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

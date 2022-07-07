@@ -55,6 +55,7 @@ task mosdepth {
     # inputs
     bam: { help: "BAM file of aligned reads." }
     bai: { help: "BAM index file." }
+    threads: { help: "Number of threads to be used." }
 
     # outputs
     global_dist: { description: "Text file containing cumulative distribution indicating the proportion of total bases covered for at least a given coverage value." }
@@ -69,6 +70,8 @@ task mosdepth {
   }
 
   String output_prefix = basename(bam, ".bam")
+  Int memory = 4 * threads
+  Int disk_size = ceil(2 * (size(bam, "GB") + size(bai, "GB"))) + 20
 
   command <<<
     set -o pipefail
@@ -84,7 +87,8 @@ task mosdepth {
 
   runtime {
     cpu: threads
-    memory: "16GB"
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
     docker: "juniperlake/mosdepth:0.2.9"
@@ -100,6 +104,7 @@ task sum_floats {
   parameter_meta {
     # inputs
     floats: { help: "An array of floats." }
+    threads: { help: "Number of threads to be used." }
 
     # outputs
     sum: {description: "The sum of all numbers in input array."}
@@ -108,6 +113,8 @@ task sum_floats {
   input {
     Array[Float] floats
   }
+
+  Int disk_size = 10
 
   command <<<
     awk 'BEGIN{ print ~{sep="+" floats} }'
@@ -118,6 +125,9 @@ task sum_floats {
   }
 
   runtime {
+    cpu: threads
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
     docker: "ubuntu:20.04"

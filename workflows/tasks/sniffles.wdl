@@ -81,6 +81,7 @@ task sniffles {
     Int threads = 8
   }
 
+  Int memory = 4 * threads
   Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
   command {
@@ -104,7 +105,7 @@ task sniffles {
 
   runtime {
     cpu: threads
-    memory: "32GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

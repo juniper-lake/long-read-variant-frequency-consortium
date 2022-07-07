@@ -55,8 +55,7 @@ task minimap2 {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     output_bam: { help: "Output BAM filename." }
-    samtools_threads: { help: "Number of threads to use for SAMtools in addition to main thread." }
-    minimap_threads: { help: "Number of threads to use for minimap2." }
+    threads: { help: "Number of threads to be used." }
 
     # outputs
     bam: { description: "Output BAM filename." }
@@ -70,10 +69,12 @@ task minimap2 {
     File reference_fasta
     File reference_index
     String output_bam = "~{sample_name}.~{reference_name}.bam"
-    Int samtools_threads = 3
-    Int minimap_threads = 24
+    Int threads
   }
 
+  Int samtools_threads = 3
+  Int minimap_threads = threads - samtools_threads - 1
+  Int memory = 4 * threads
   Int disk_size = ceil(2.5 * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movies, "GB"))) + 20
 
   command {
@@ -89,8 +90,8 @@ task minimap2 {
   }
 
   runtime {
-    cpu: samtools_threads + minimap_threads + 1
-    memory: "96GB"
+    cpu: threads
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

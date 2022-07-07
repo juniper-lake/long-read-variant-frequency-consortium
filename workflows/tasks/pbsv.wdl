@@ -116,6 +116,7 @@ task pbsv_discover_by_region {
     Int threads = 4
     }
 
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * (size(bams, "GB"))) + 20
 
   command<<<
@@ -146,7 +147,7 @@ task pbsv_discover_by_region {
 
   runtime {
     cpu: threads
-    memory: "16GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
@@ -186,6 +187,7 @@ task pbsv_call_by_region {
     Int threads = 8
   }
 
+  Int memory = 6 * threads
   Int disk_size = 200
 
   command<<<
@@ -216,7 +218,7 @@ task pbsv_call_by_region {
   
   runtime {
     cpu: threads
-    memory: "48GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
@@ -252,6 +254,7 @@ task concat_pbsv_vcfs {
     Int threads = 4
   }
 
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * (size(input_vcfs, "GB") + size(input_indexes, "GB"))) + 20
 
   command {
@@ -267,7 +270,7 @@ task concat_pbsv_vcfs {
 
   runtime {
     cpu: threads
-    memory: "16GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

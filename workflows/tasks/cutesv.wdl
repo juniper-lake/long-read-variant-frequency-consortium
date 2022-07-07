@@ -86,6 +86,7 @@ task cutesv {
     Int threads = 16
   }
 
+  Int memory = 2 * threads
   Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
   command {
@@ -110,7 +111,7 @@ task cutesv {
 
   runtime {
     cpu: threads
-    memory: "32GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

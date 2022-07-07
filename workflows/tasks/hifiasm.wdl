@@ -78,7 +78,7 @@ task hifiasm_assemble {
   }
 
   Int disk_size = ceil(3.25 * size(movie_fastxs, "GB")) + 20
-  Int memory = threads * 3
+  Int memory = 3 * threads
   
   command {
     set -o pipefail
@@ -120,6 +120,7 @@ task gfa2fa {
   }
 
   String output_filename = "~{basename(gfa, '.gfa')}.fasta"
+  Int memory = 3 * threads
   Int disk_size = ceil(3.25 * size(gfa, "GB")) + 20
 
   command {
@@ -133,7 +134,7 @@ task gfa2fa {
 
   runtime {
     cpu: threads
-    memory: "14GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1
@@ -162,6 +163,7 @@ task bgzip_fasta {
   }
 
   String output_filename = "~{basename(fasta)}.gz"
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * size(fasta, "GB")) + 20
 
   command {
@@ -175,7 +177,7 @@ task bgzip_fasta {
 
   runtime {
     cpu: threads
-    memory: "16GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1

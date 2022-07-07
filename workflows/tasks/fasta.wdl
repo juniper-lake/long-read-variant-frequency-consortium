@@ -64,6 +64,10 @@ task check_if_ubam {
     File movie
   }
 
+  Int threads = 1
+  Int memory = 4 * threads
+  Int disk_size = ceil(1.25 * size(movie, "GB")) + 20
+
   command {
     if [[ $(basename ~{movie}) == *.bam ]]; then
       echo "true"
@@ -77,6 +81,9 @@ task check_if_ubam {
   }
 
   runtime {
+    cpu: threads
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
     docker: "ubuntu:20.04"
@@ -106,6 +113,7 @@ task ubam_to_fasta {
   String movie_name = sub(basename(movie), "\\..*", "")
   String output_fasta = "~{movie_name}.fasta"
   Int threads_m1 = threads - 1
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * size(movie, "GB")) + 20
 
   command {
@@ -119,7 +127,7 @@ task ubam_to_fasta {
 
   runtime {
     cpu: threads
-    memory: "16GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
@@ -145,6 +153,10 @@ task do_nothing {
     File input_file
   }
 
+  Int threads = 1
+  Int memory = 4 * threads
+  Int disk_size = ceil(1.25 * size(input_file, "GB")) + 20
+
   command {
   }
 
@@ -153,6 +165,9 @@ task do_nothing {
   }
 
   runtime {
+    cpu: threads
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
     docker: "ubuntu:20.04"

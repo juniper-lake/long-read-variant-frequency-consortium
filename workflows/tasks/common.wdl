@@ -18,7 +18,9 @@ task sort_vcf {
     File input_vcf
     String output_filename
   }
-
+  
+  Int threads = 1
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * size(input_vcf, "GB")) + 20
 
   command {
@@ -31,7 +33,8 @@ task sort_vcf {
   }
 
   runtime {
-    memory: "16GB"
+    cpu: threads
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1
@@ -60,6 +63,7 @@ task zip_and_index_vcf {
     Int threads = 2
   }
 
+  Int memory = 4 * threads
   String output_filename = "~{basename(input_vcf)}.gz"
   Int disk_size = ceil(3.25 * size(input_vcf, "GB")) + 20
 
@@ -76,7 +80,7 @@ task zip_and_index_vcf {
 
   runtime {
     cpu: threads
-    memory: "16GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} HDD"
     maxRetries: 3
     preemptible: 1

@@ -85,6 +85,8 @@ task svim_alignment {
     File reference_index
   }
 
+  Int threads = 1
+  Int memory = 8 * threads
   Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
   command {
@@ -104,7 +106,7 @@ task svim_alignment {
   }
 
   runtime {
-    memory: "8GB"
+    memory: "~{memory}GB"
     disks: "local-disk ~{disk_size} SSD"
     maxRetries: 3
     preemptible: 1

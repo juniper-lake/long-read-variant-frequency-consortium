@@ -56,9 +56,7 @@ task pbmm2_align {
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     movie: { help: "An BAM or FASTQ file containing HiFi reads." }
-    movie_name: { help: "Name of the HiFi reads movie, used for file labeling." }
     sample_name: { help: "Name of the sample." }
-    output_bam: { help: "Name of the output bam file." }
     threads: { help: "Number of threads to be used." }
 
     # outputs
@@ -72,11 +70,11 @@ task pbmm2_align {
     File reference_index
     File movie
     String sample_name
-    String movie_name = sub(basename(movie), "\..*", "")
-    String output_bam = "~{movie_name}.~{reference_name}.bam"
     Int threads = 24
     }
 
+  String movie_name = sub(basename(movie), "\..*", "")
+  String output_bam = "~{movie_name}.~{reference_name}.bam"
   Float multiplier = 2.5
   Int disk_size = ceil(multiplier * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movie, "GB"))) + 20
   

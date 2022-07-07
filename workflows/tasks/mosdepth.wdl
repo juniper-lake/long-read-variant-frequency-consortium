@@ -55,7 +55,6 @@ task mosdepth {
     # inputs
     bam: { help: "BAM file of aligned reads." }
     bai: { help: "BAM index file." }
-    output_prefix: { help: "Prefix for output files." }
 
     # outputs
     global_dist: { description: "Text file containing cumulative distribution indicating the proportion of total bases covered for at least a given coverage value." }
@@ -66,9 +65,10 @@ task mosdepth {
   input {
     File bam
     File bai
-    String output_prefix = basename(bam, ".bam")
     Int threads = 4
   }
+
+  String output_prefix = basename(bam, ".bam")
 
   command <<<
     set -o pipefail

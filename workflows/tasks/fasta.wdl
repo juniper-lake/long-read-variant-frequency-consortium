@@ -92,9 +92,7 @@ task ubam_to_fasta {
   parameter_meta {
     # inputs
     movie: { help: "UBAM file to be converted." }
-    movie_name: { help: "Name of the movie, used for file naming." }
     threads: { help: "Number of threads to be used." }
-    threads_m1: { help: "Total number of threads minus 1, because samtools is silly." }
 
     # outputs
     fasta: { description: "FASTA file." }
@@ -102,12 +100,12 @@ task ubam_to_fasta {
   
   input {
     File movie
-    String movie_name = sub(basename(movie), "\..*", "")
-    String output_fasta = "~{movie_name}.fasta"
     Int threads = 4
-    Int threads_m1 = threads - 1
   }
-  
+
+  String movie_name = sub(basename(movie), "\\..*", "")
+  String output_fasta = "~{movie_name}.fasta"
+  Int threads_m1 = threads - 1
   Int disk_size = ceil(3.25 * size(movie, "GB")) + 20
 
   command {

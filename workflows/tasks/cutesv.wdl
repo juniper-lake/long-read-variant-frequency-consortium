@@ -86,8 +86,7 @@ task cutesv {
     Int threads = 16
   }
 
-  Float multiplier = 2.5
-  Int disk_size = ceil(multiplier * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
+  Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
   command {
     set -o pipefail

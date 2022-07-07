@@ -89,8 +89,7 @@ task somalier {
     Int threads = length(bams)
   }
 
-  Float multiplier = 1.5
-  Int disk_size = ceil(multiplier * (size(bams, "GB") + size(reference_fasta, "GB"))) + 20
+  Int disk_size = ceil(1.5 * (size(bams, "GB") + size(reference_fasta, "GB"))) + 20
   Int memory = 2 * threads
 
   command<<<

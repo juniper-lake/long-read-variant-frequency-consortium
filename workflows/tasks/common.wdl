@@ -48,7 +48,6 @@ task zip_and_index_vcf {
   parameter_meta {
     # inputs
     input_vcf: { help: "VCF file to be gzipped and indexed." }
-    output_filename: { help: "Output filename." }
     threads: { help: "Number of threads to use." }
 
     # outputs
@@ -58,10 +57,10 @@ task zip_and_index_vcf {
 
   input {
     File input_vcf
-    String output_filename = "~{basename(input_vcf)}.gz"
     Int threads = 2
   }
 
+  String output_filename = "~{basename(input_vcf)}.gz"
   Int disk_size = ceil(3.25 * size(input_vcf, "GB")) + 20
 
   command {

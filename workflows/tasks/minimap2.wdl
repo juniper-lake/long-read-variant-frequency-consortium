@@ -74,8 +74,7 @@ task minimap2 {
     Int minimap_threads = 24
   }
 
-  Float multiplier = 2.5
-  Int disk_size = ceil(multiplier * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movies, "GB"))) + 20
+  Int disk_size = ceil(2.5 * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movies, "GB"))) + 20
 
   command {
     set -o pipefail

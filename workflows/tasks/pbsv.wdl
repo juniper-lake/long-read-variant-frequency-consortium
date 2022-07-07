@@ -116,8 +116,7 @@ task pbsv_discover_by_region {
     Int threads = 4
     }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * (size(bams, "GB"))) + 20
+  Int disk_size = ceil(3.25 * (size(bams, "GB"))) + 20
 
   command<<<
     set -o pipefail
@@ -253,8 +252,7 @@ task concat_pbsv_vcfs {
     Int threads = 4
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * (size(input_vcfs, "GB") + size(input_indexes, "GB"))) + 20
+  Int disk_size = ceil(3.25 * (size(input_vcfs, "GB") + size(input_indexes, "GB"))) + 20
 
   command {
     set -o pipefail

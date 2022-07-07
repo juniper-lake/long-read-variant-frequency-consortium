@@ -77,8 +77,7 @@ task hifiasm_assemble {
     Int threads = 48
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(movie_fastxs, "GB")) + 20
+  Int disk_size = ceil(3.25 * size(movie_fastxs, "GB")) + 20
   Int memory = threads * 3
   
   command {
@@ -110,7 +109,6 @@ task gfa2fa {
   parameter_meta {
     # inputs
     gfa: { help: "GFA file to convert." }
-    output_filename: { help: "Filename for output FASTA." }
     threads: { help: "Number of threads to use." }
     
     # outputs
@@ -118,12 +116,11 @@ task gfa2fa {
   }
   input {
     File gfa
-    String output_filename = "~{basename(gfa, '.gfa')}.fasta"
     Int threads = 4
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(gfa, "GB")) + 20
+  String output_filename = "~{basename(gfa, '.gfa')}.fasta"
+  Int disk_size = ceil(3.25 * size(gfa, "GB")) + 20
 
   command {
     set -o pipefail
@@ -153,7 +150,6 @@ task bgzip_fasta {
   parameter_meta {
     # inputs
     fasta: { help: "FASTA file to zip." }
-    output_filename: { help: "Filename for output zipped FASTA." }
     threads: { help: "Number of threads to use." }
 
     # outputs
@@ -162,12 +158,11 @@ task bgzip_fasta {
   
   input {
     File fasta
-    String output_filename = "~{basename(fasta)}.gz"
     Int threads = 4
   }
 
-  Float multiplier = 3.25
-  Int disk_size = ceil(multiplier * size(fasta, "GB")) + 20
+  String output_filename = "~{basename(fasta)}.gz"
+  Int disk_size = ceil(3.25 * size(fasta, "GB")) + 20
 
   command {
     set -o pipefail

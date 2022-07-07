@@ -77,8 +77,7 @@ task deepvariant {
     Int threads = 64
   }
   
-  Float disk_multiplier = 3.25
-  Int disk_size = ceil(disk_multiplier * (size(reference_fasta, "GB") + size(bams, "GB"))) + 20
+  Int disk_size = ceil(3.25 * (size(reference_fasta, "GB") + size(bams, "GB"))) + 20
 
   command {
     set -o pipefail

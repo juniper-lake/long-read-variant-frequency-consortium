@@ -73,10 +73,9 @@ task pbmm2_align {
     Int threads = 24
     }
 
-  String movie_name = sub(basename(movie), "\..*", "")
+  String movie_name = sub(basename(movie), "\\..*", "")
   String output_bam = "~{movie_name}.~{reference_name}.bam"
-  Float multiplier = 2.5
-  Int disk_size = ceil(multiplier * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movie, "GB"))) + 20
+  Int disk_size = ceil(2.5 * (size(reference_fasta, "GB") + size(reference_index, "GB") + size(movie, "GB"))) + 20
   
   command {
     set -o pipefail

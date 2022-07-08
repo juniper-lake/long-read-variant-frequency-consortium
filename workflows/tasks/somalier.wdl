@@ -33,41 +33,108 @@ workflow run_somalier {
     File sites_vcf
   }
 
-  call somalier {
+  scatter (idx in range(length(bams))) {
+    # extract genotypes at known sites
+    call somalier_extract {
+      input: 
+        sample_name = sample_name,
+        bam = bams[idx],
+        bai = bais[idx],
+        reference_name = reference_name,
+        reference_fasta = reference_fasta,
+        reference_index = reference_index,
+        sites_vcf = sites_vcf
+    }
+  }
+
+  call somalier_relate {
     input:
       sample_name = sample_name,
-      bams = bams,
-      bais = bais,
-      reference_name = reference_name,
-      reference_fasta = reference_fasta,
-      reference_index = reference_index,
-      sites_vcf = sites_vcf
+      somalier_files = somalier_extract.somalier
   }
 
   output {
-    File groups = somalier.groups
-    File html = somalier.html
-    File pairs = somalier.pairs
-    File samples = somalier.samples
-    Int min_relatedness = somalier.min_relatedness
+    File groups = somalier_relate.groups
+    File html = somalier_relate.html
+    File pairs = somalier_relate.pairs
+    File samples = somalier_relate.samples
+    Int min_relatedness = somalier_relate.min_relatedness
   }
 }
 
-
-task somalier {
+task somalier_extract {
   meta {
-    description: "Extract informative sites from BAM and check for sample swaps with somalier."
+    description: "Extract informative sites from BAM."
   }
 
   parameter_meta {
     # inputs
     sample_name: { help: "Name of the sample." }
-    bams: { help: "Array of aligned bam file." }
-    bais: { help: "Array of aligned bam index." }
+    bam: { help: "Aligned bam file." }
+    bai: { help: "Aligned bam index." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
     sites_vcf: { help: "List of known polymorphic sites provided by somalier." }
+
+    # outputs
+    somalier: { description: "Somalier file containing extract read information at known sites." }
+  }
+
+  input {
+    String sample_name
+    File bam
+    File bai
+    String reference_name
+    File reference_fasta
+    File reference_index
+    File sites_vcf
+  }
+
+  String movie_name = basename(bam, ".~{reference_name}.bam")
+  Int disk_size = ceil(1.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 10
+  Int threads = 1
+  Int memory = 4 * threads
+
+  command<<<
+    set -o pipefail
+    
+    # symlink bam and bai to same location so they can be found together
+    ln -s "$(readlink -f "~{bam}")" .
+    ln -s "$(readlink -f "~{bai}")" .
+
+    # extract genotype-like information for a single-sample at selected sites 
+    somalier extract \
+      --fasta=~{reference_fasta} \
+      --sites=~{sites_vcf} \
+      --out-dir=~{movie_name} \
+      --sample-prefix=~{movie_name} \
+      ~{bam}
+  >>>
+
+  output {
+    File somalier = "~{movie_name}/~{sample_name}.somalier"
+  }
+
+  runtime {
+    cpu: threads
+    memory: "~{memory}GB"
+    disks: "local-disk ~{disk_size} SSD"
+    maxRetries: 3
+    preemptible: 1
+    docker: "brentp/somalier:v0.2.15"
+  }
+}
+
+task somalier_relate {
+  meta {
+    description: "Calculate relatedness to detect sample swaps with somalier."
+  }
+
+  parameter_meta {
+    # inputs
+    sample_name: { help: "Name of the sample." }
+    somalier_files: { help: "Array of somalier files produce by the extract function." }
 
     # outputs
     groups: { description: "Multi-sample group relatedness." }
@@ -79,42 +146,21 @@ task somalier {
 
   input {
     String sample_name
-    Array[File] bams
-    Array[File] bais
-    String reference_name
-    File reference_fasta
-    File reference_index
-    File sites_vcf
+    Array[File] somalier_files
   }
 
-  Int disk_size = ceil(1.5 * (size(bams, "GB") + size(reference_fasta, "GB"))) + 20
-  Int threads = length(bams)
-  Int memory = 2 * threads
+  Int disk_size = 20
+  Int threads = 1
+  Int memory = 4 * threads
 
   command<<<
     set -o pipefail
-    
-    # symlink bams and bais to a single folder so indexes can be found
-    mkdir bams_and_bais
-    for file in ~{sep=" " bams} ~{sep=" " bais}; do 
-      ln -s "$(readlink -f $file)" bams_and_bais
-    done
-
-    # extract genotype-like information for a single-sample at selected sites 
-    for bam in bams_and_bais/*.bam; do
-      somalier extract \
-        --fasta=~{reference_fasta} \
-        --sites=~{sites_vcf} \
-        --out-dir="$(basename "$bam" .~{reference_name}.bam)" \
-        --sample-prefix="$(basename "$bam" .~{reference_name}.bam)" \
-        "$bam" &
-    done
 
     # calculate relatedness among samples from extracted, genotype-like information
     somalier relate \
       --min-depth=4 \
       --output-prefix=~{sample_name}.somalier \
-      ./*/*.somalier
+      ~{sep=" " somalier_files}
     
     # get minimum pairwise relatedness
     awk 'NR>1 {print $3}' ~{sample_name}.somalier.pairs.tsv | sort -n | head -1 > min_relatedness.txt

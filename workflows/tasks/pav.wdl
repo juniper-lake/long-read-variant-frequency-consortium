@@ -1,5 +1,7 @@
 version 1.0
 
+import "common.wdl" as common
+
 workflow run_pav {
   meta {
     description: "Finds variants from phased assembly using PAV."
@@ -16,7 +18,6 @@ workflow run_pav {
 
     # outputs
     vcf: { description: "VCF containing variants called using PAV." }
-    index: { description: "Index file for the VCF." }
   }
 
   input {
@@ -38,9 +39,13 @@ workflow run_pav {
       reference_index = reference_index,
   }
   
+  call common.unzip_vcf {
+    input: 
+      input_vcf = pav.vcf
+  }
+
   output {
-    File vcf = pav.vcf
-    File index = pav.index
+    File vcf = unzip_vcf.vcf
   }
 }
 

@@ -1,7 +1,5 @@
 version 1.0
 
-import "common.wdl" as common
-
 workflow run_pbsv {
   meta {
     description: "Discovers SV signatures and calls SVs."
@@ -19,7 +17,7 @@ workflow run_pbsv {
     tr_bed: { help: "BED file containing known tandem repeats." }
 
     # outputs
-    svsigs: { description: "SV signature files for all regions." }
+    vcf: { description: "VCF with structural variants called by pbsv." }
   }
 
   input {
@@ -54,12 +52,6 @@ workflow run_pbsv {
         reference_index = reference_index,
         region = regions[idx],
     }
-    
-    # zip and index region-specific VCFs
-    call common.zip_and_index_vcf {
-      input: 
-        input_vcf = pbsv_call_by_region.vcf,
-    }
   }
 
   # concatenate all region-specific VCFs into a single genome-wide VCF
@@ -67,22 +59,11 @@ workflow run_pbsv {
     input: 
       sample_name = sample_name,
       reference_name = reference_name,
-      input_vcfs = zip_and_index_vcf.vcf,
-      input_indexes = zip_and_index_vcf.index,
-  }
-
-  # gzip and index the genome-wide VCF
-  call common.zip_and_index_vcf as zip_and_index_final_vcf {
-    input: 
-      input_vcf = concat_pbsv_vcfs.vcf,
+      input_vcfs = pbsv_call_by_region.vcf,
   }
 
   output {
-    Array[File] svsigs = pbsv_discover_by_region.svsig
-    File vcf = zip_and_index_final_vcf.vcf
-    File index = zip_and_index_final_vcf.index
-    Array[File] region_vcfs = zip_and_index_vcf.vcf
-    Array[File] region_indexes = zip_and_index_vcf.index
+    File vcf = concat_pbsv_vcfs.vcf
   }
 }
 
@@ -202,7 +183,7 @@ task pbsv_call_by_region {
 
     pbsv call \
       --hifi \
-      --min-sv-length 30 \
+      --min-sv-length 20 \
       --call-min-reads-all-samples 2 \
       --call-min-reads-one-sample 2 \
       --call-min-read-perc-one-sample 10 \
@@ -237,7 +218,6 @@ task concat_pbsv_vcfs {
     sample_name: { help: "Name of sample (if singleton) or group (if set of samples)." }
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     input_vcfs: { help: "VCF files to be concatenated." }
-    input_indexes: { help: "Index files for VCFs." }
     output_filename: { help: "Name of the output VCF file." }
     threads: { help: "Number of threads to be used." }
 
@@ -249,13 +229,12 @@ task concat_pbsv_vcfs {
     String sample_name
     String reference_name
     Array[File] input_vcfs
-    Array[File] input_indexes
     String output_filename = "~{sample_name}.~{reference_name}.pbsv.vcf"
     Int threads = 4
   }
 
   Int memory = 4 * threads
-  Int disk_size = ceil(3.25 * (size(input_vcfs, "GB") + size(input_indexes, "GB"))) + 20
+  Int disk_size = ceil(3.25 * size(input_vcfs, "GB")) + 20
 
   command {
     set -o pipefail

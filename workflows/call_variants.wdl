@@ -169,23 +169,17 @@ workflow call_variants {
     Array[Float] mosdepth_coverages = run_mosdepth.coverages
     Float mosdepth_total_coverage = run_mosdepth.total_coverage
     File somalier_pairs = run_somalier.pairs
-    Int somalier_min_relatedness = run_somalier.min_relatedness
+    Float somalier_min_relatedness = run_somalier.min_relatedness
     File pbsv_vcf = run_pbsv.vcf
-    File pbsv_index = run_pbsv.index
-    Array[File] pbsv_svsigs = run_pbsv.svsigs
     File deepvariant_vcf = run_deepvariant.vcf
     File deepvariant_index = run_deepvariant.index
     File minimap2_bam = run_minimap2.bam
     File minimap2_bai = run_minimap2.bai
     File svim_vcf = run_svim.vcf
-    File svim_index = run_svim.index
     File sniffles_vcf = run_sniffles.vcf
-    File sniffles_index = run_sniffles.index
     File cutesv_vcf = run_cutesv.vcf
-    File cutesv_index = run_cutesv.index
     File hifiasm_hap1_fasta = run_hifiasm.hap1_fasta
     File hifiasm_hap2_fasta = run_hifiasm.hap2_fasta
     File pav_vcf = run_pav.vcf
-    File pav_index = run_pav.index
   }
 }

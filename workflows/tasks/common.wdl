@@ -43,39 +43,36 @@ task sort_vcf {
 }
 
 
-task zip_and_index_vcf {
+task unzip_vcf {
   meta {
-    description: "Zips and indexes a vcf file."
+    description: "Unzips a vcf file."
   }
 
   parameter_meta {
     # inputs
-    input_vcf: { help: "VCF file to be gzipped and indexed." }
-    threads: { help: "Number of threads to use." }
+    input_vcf: { help: "Gzipped VCF file." }
 
     # outputs
-    vcf: { description: "Gzipped and indexed VCF file." }
-    index: { description: "Tabix index file." }
+    vcf: { description: "Unzipped VCF file." }
   }
 
   input {
     File input_vcf
-    Int threads = 2
   }
 
+  Int threads = 1
   Int memory = 4 * threads
-  String output_filename = "~{basename(input_vcf)}.gz"
+  String output_filename = basename(input_vcf, ".gz")
   Int disk_size = ceil(3.25 * size(input_vcf, "GB")) + 20
 
   command {
     set -o pipefail
-    bgzip --threads ~{threads} ~{input_vcf} -c > ~{output_filename}
+    bgzip -d -c ~{input_vcf} > ~{output_filename}
     tabix --preset vcf ~{output_filename}
   }
 
   output {
     File vcf = output_filename
-    File index = "~{output_filename}.tbi"
   }
 
   runtime {

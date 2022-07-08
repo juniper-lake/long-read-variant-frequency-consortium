@@ -47,15 +47,8 @@ workflow run_svim {
       output_filename = "~{sample_name}.~{reference_name}.svim.vcf"
   }
 
-  # zip and index VCF
-  call common.zip_and_index_vcf {
-    input:
-      input_vcf = sort_vcf.vcf,
-  }
-
   output {
-    File vcf = zip_and_index_vcf.vcf
-    File index = zip_and_index_vcf.index
+    File vcf = sort_vcf.vcf
   }
 }
 
@@ -93,7 +86,7 @@ task svim_alignment {
     set -o pipefail
     svim alignment \
       --sample ~{sample_name}_svim \
-      --min_sv_size 30 \
+      --min_sv_size 20 \
       --min_mapq 20 \
       --minimum_depth 2 \
       "." \

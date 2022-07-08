@@ -1,10 +1,8 @@
 version 1.0
 
-import "common.wdl" as common
-
 workflow run_cutesv {
   meta {
-    description: "Call structural variants from aligned reads with cuteSV, then zip and index VCF."
+    description: "Call structural variants from aligned reads with cuteSV."
   }
 
   parameter_meta {
@@ -18,7 +16,6 @@ workflow run_cutesv {
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
-    index: { description: "VCF index file." }
   }
 
   input {
@@ -41,15 +38,8 @@ workflow run_cutesv {
       reference_index = reference_index,
   }
 
-  # zip and index VCF
-  call common.zip_and_index_vcf {
-    input:
-      input_vcf = cutesv.vcf,
-  }
-
   output {
-    File vcf = zip_and_index_vcf.vcf
-    File index = zip_and_index_vcf.index
+    File vcf = cutesv.vcf
   }
 
 }
@@ -68,7 +58,6 @@ task cutesv {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    output_vcf: { help: "Filename for output VCF." }
     threads: { help: "Number of threads to be used." }
 
     # outputs
@@ -82,10 +71,10 @@ task cutesv {
     String reference_name
     File reference_fasta
     File reference_index
-    String output_vcf = "~{sample_name}.~{reference_name}.vcf"
     Int threads = 16
   }
-
+  
+  String output_vcf = "~{sample_name}.~{reference_name}.cutesv.vcf"
   Int memory = 2 * threads
   Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
@@ -95,7 +84,7 @@ task cutesv {
       --threads ~{threads} \
       --sample ~{sample_name}_cutesv \
       --genotype \
-      --min_size 30 \
+      --min_size 20 \
       --min_mapq 20 \
       --min_support 2 \
       --max_cluster_bias_INS 1000 \

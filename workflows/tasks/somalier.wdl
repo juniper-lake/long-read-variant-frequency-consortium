@@ -58,7 +58,7 @@ workflow run_somalier {
     File html = somalier_relate.html
     File pairs = somalier_relate.pairs
     File samples = somalier_relate.samples
-    Int min_relatedness = somalier_relate.min_relatedness
+    Float min_relatedness = somalier_relate.min_relatedness
   }
 }
 
@@ -171,7 +171,7 @@ task somalier_relate {
     File html = "~{sample_name}.somalier.html"
     File pairs = "~{sample_name}.somalier.pairs.tsv"
     File samples = "~{sample_name}.somalier.samples.tsv"
-    Int min_relatedness = read_float("min_relatedness.txt")
+    Float min_relatedness = read_float("min_relatedness.txt")
   }
 
   runtime {

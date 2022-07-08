@@ -171,7 +171,7 @@ task somalier_relate {
     File html = "~{sample_name}.somalier.html"
     File pairs = "~{sample_name}.somalier.pairs.tsv"
     File samples = "~{sample_name}.somalier.samples.tsv"
-    Int min_relatedness = read_int("min_relatedness.txt")
+    Int min_relatedness = read_float("min_relatedness.txt")
   }
 
   runtime {

@@ -80,7 +80,7 @@ task hifiasm_assemble {
   }
 
   Int disk_size = ceil(3.25 * size(movie_fastxs, "GB")) + 20
-  Int memory = 3 * threads
+  Int memory = 6 * threads
   
   command {
     set -o pipefail

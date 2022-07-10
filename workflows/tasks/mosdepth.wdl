@@ -2,46 +2,36 @@ version 1.0
 
 workflow run_mosdepth {
   meta {
-    description: "Calculate coverage for each bam in array and sum."
+    description: "Calculate coverage for a bam."
   }
 
   parameter_meta {
     # inputs
-    bams: { help: "Array of aligned BAM files." }
-    bais: { help: "Array of BAM index files." }
+    bam: { help: "Aligned BAM file." }
+    bai: { help: "BAM index file." }
 
     # outputs
-    global_dists: { description: "Text files containing cumulative distribution indicating the proportion of total bases covered for at least a given coverage value." }
-    summaries: { description: "Text files containing summary of mean depths per chromosome and within specified regions per chromosome." }
-    coverages: { description: "Mean coverages of each bam file. "}
+    global_dist: { description: "Text file containing cumulative distribution indicating the proportion of total bases covered for at least a given coverage value." }
+    summary: { description: "Text file containing summary of mean depths per chromosome and within specified regions per chromosome." }
     total_coverage: { description: "Mean coverage of entire genome." }
   }
 
   input {
-    Array[File] bams
-    Array[File] bais
+    File bam
+    File bai
   }
 
-  scatter (idx in range(length(bams))) { 
-    # for each bam, calculate coverage
-    call mosdepth {
-      input:
-        bam = bams[idx],
-        bai = bais[idx],
-    }
-  }
-
-  # sum coverages from each individual bam
-  call sum_floats {
-    input: 
-      floats = mosdepth.coverage
+  # calculate coverage
+  call mosdepth {
+    input:
+      bam = bam,
+      bai = bai
   }
 
   output {
-    Array[File] global_dists = mosdepth.global_dist
-    Array[File] summaries = mosdepth.summary
-    Array[Float] coverages = mosdepth.coverage
-    Float total_coverage = sum_floats.sum
+    File global_dists = mosdepth.global_dist
+    File summaries = mosdepth.summary
+    Float total_coverage = mosdepth.total_coverage
   }
 }
 
@@ -60,7 +50,7 @@ task mosdepth {
     # outputs
     global_dist: { description: "Text file containing cumulative distribution indicating the proportion of total bases covered for at least a given coverage value." }
     summary: { description: "Text file containing summary of mean depths per chromosome and within specified regions per chromosome." }
-    coverage: { description: "Mean coverage of entire genome as float." }
+    total_coverage: { description: "Mean coverage of entire genome as float." }
   }
 
   input {
@@ -82,7 +72,7 @@ task mosdepth {
   output {
     File global_dist = "~{output_prefix}.mosdepth.global.dist.txt"
     File summary = "~{output_prefix}.mosdepth.summary.txt"
-    Float coverage = read_float("mean_coverage.txt")
+    Float total_coverage = read_float("mean_coverage.txt")
   }
 
   runtime {
@@ -92,45 +82,5 @@ task mosdepth {
     maxRetries: 3
     preemptible: 1
     docker: "juniperlake/mosdepth:0.2.9"
-  }
-}
-
-
-task sum_floats {
-  meta {
-    description: "Sum floats in an array of floats."
-  }
-  
-  parameter_meta {
-    # inputs
-    floats: { help: "An array of floats." }
-
-    # outputs
-    sum: {description: "The sum of all numbers in input array."}
-  }
-
-  input {
-    Array[Float] floats
-  }
-  
-  Int threads = 1
-  Int memory = 2 * threads
-  Int disk_size = 10
-
-  command <<<
-    awk 'BEGIN{ print ~{sep="+" floats} }'
-  >>>
-
-  output {
-    Float sum = read_float(stdout())
-  }
-
-  runtime {
-    cpu: threads
-    memory: "~{memory}GB"
-    disks: "local-disk ~{disk_size} HDD"
-    maxRetries: 3
-    preemptible: 1
-    docker: "ubuntu:20.04"
   }
 }

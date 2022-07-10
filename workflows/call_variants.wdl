@@ -64,13 +64,6 @@ workflow call_variants {
       sites_vcf = sites_vcf
   }
 
-  # check coverage
-  call mosdepth.run_mosdepth {
-    input:
-      bams = run_pbmm2.bams,
-      bais = run_pbmm2.bais,
-  }
-
   # run pbsv 
   call pbsv.run_pbsv {
     input: 
@@ -109,6 +102,13 @@ workflow call_variants {
       reference_name = reference_name,
       reference_fasta = reference_fasta,
       reference_index = reference_index,
+  }
+
+  # check coverage
+  call mosdepth.run_mosdepth {
+    input:
+      bam = run_minimap2.bam,
+      bai = run_minimap2.bai,
   }
 
   # run svim on minimap2 alignments
@@ -166,7 +166,6 @@ workflow call_variants {
   output {
     Array[File] pbmm2_bams = run_pbmm2.bams
     Array[File] pbmm2_bais = run_pbmm2.bais
-    Array[Float] mosdepth_coverages = run_mosdepth.coverages
     Float mosdepth_total_coverage = run_mosdepth.total_coverage
     File somalier_pairs = run_somalier.pairs
     Float somalier_min_relatedness = run_somalier.min_relatedness

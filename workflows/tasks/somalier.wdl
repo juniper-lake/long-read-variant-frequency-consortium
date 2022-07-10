@@ -59,7 +59,7 @@ workflow run_somalier {
     File pairs = somalier_relate.pairs
     File samples = somalier_relate.samples
     Float min_relatedness = somalier_relate.min_relatedness
-    Int inferred_sex = somalier_relate.inferred_sex
+    String inferred_sex = somalier_relate.inferred_sex
   }
 }
 

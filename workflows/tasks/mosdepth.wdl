@@ -29,8 +29,8 @@ workflow run_mosdepth {
   }
 
   output {
-    File global_dists = mosdepth.global_dist
-    File summaries = mosdepth.summary
+    File global_dist = mosdepth.global_dist
+    File summary = mosdepth.summary
     Float total_coverage = mosdepth.total_coverage
   }
 }

@@ -42,13 +42,8 @@ workflow run_sniffles {
       tr_bed = tr_bed,
   }
 
-  call common.unzip_vcf {
-    input: 
-      input_vcf = sniffles.vcf
-  }
-
   output {
-    File vcf = unzip_vcf.vcf
+    File vcf = sniffles.vcf
   }
 }
 
@@ -71,7 +66,6 @@ task sniffles {
 
     # outputs
     vcf: { description: "VCF with structural variants called by Sniffles2." }
-    index: { description: "VCF index file." }
   }
   input {
     String sample_name
@@ -84,7 +78,7 @@ task sniffles {
     Int threads = 8
   }
 
-  String output_vcf = "~{sample_name}.~{reference_name}.sniffles.vcf.gz"
+  String output_vcf = "~{sample_name}.~{reference_name}.sniffles.vcf"
   Int memory = 4 * threads
   Int disk_size = ceil(2.5 * (size(bam, "GB") + size(reference_fasta, "GB"))) + 20
 
@@ -104,7 +98,6 @@ task sniffles {
 
   output {
     File vcf = output_vcf
-    File index = "~{output_vcf}.tbi"
   }
 
   runtime {

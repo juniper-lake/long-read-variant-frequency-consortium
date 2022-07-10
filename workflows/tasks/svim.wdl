@@ -18,7 +18,6 @@ workflow run_svim {
 
     # outputs
     vcf: { description: "Gzipped VCF with structural variants called by SVIM." }
-    index: { description: "VCF index file." }
   }
 
   input {

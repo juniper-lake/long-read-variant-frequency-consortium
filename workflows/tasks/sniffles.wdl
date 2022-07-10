@@ -1,7 +1,5 @@
 version 1.0
 
-import "common.wdl" as common
-
 workflow run_sniffles {
   meta {
     description: "Call structural variants from aligned reads with Sniffles2."

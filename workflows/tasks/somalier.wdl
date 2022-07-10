@@ -59,6 +59,7 @@ workflow run_somalier {
     File pairs = somalier_relate.pairs
     File samples = somalier_relate.samples
     Float min_relatedness = somalier_relate.min_relatedness
+    Int inferred_sex = somalier_relate.inferred_sex
   }
 }
 
@@ -142,6 +143,7 @@ task somalier_relate {
     pairs: { description: "Pairwise relatedness, concordance, etc." }
     samples: { description: "Sample variant statistics." }
     min_relatedness: { description: "The minimum pairwise relatedness among the bam files, to test for sample swaps." }
+    inferred_sex: { description: "1 is male, 2 is female." }
   }
 
   input {
@@ -159,11 +161,24 @@ task somalier_relate {
     # calculate relatedness among samples from extracted, genotype-like information
     somalier relate \
       --min-depth=4 \
+      --infer \
       --output-prefix=~{sample_name}.somalier \
       ~{sep=" " somalier_files}
     
     # get minimum pairwise relatedness
     awk 'NR>1 {print $3}' ~{sample_name}.somalier.pairs.tsv | sort -n | head -1 > min_relatedness.txt
+    # get inferred sex
+    LOW=$(awk 'NR>1 {print $5}' ~{sample_name}.somalier.samples.tsv | sort -n | head -1)
+    HIGH=$(awk 'NR>1 {print $5}' ~{sample_name}.somalier.samples.tsv | sort -n | tail -1)
+    if [ $HIGH -eq $LOW ]; then
+      if [ $HIGH -eq 1 ]; then
+        echo "M" > inferred_sex.txt
+      elif [ $HIGH -eq 2 ]; then
+        echo "F" > inferred_sex.txt
+      fi
+    else
+      echo "U" > inferred_sex.txt
+    fi
   >>>
 
   output {
@@ -172,6 +187,7 @@ task somalier_relate {
     File pairs = "~{sample_name}.somalier.pairs.tsv"
     File samples = "~{sample_name}.somalier.samples.tsv"
     Float min_relatedness = read_float("min_relatedness.txt")
+    String inferred_sex = read_string("inferred_sex.txt")
   }
 
   runtime {

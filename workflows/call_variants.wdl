@@ -52,13 +52,6 @@ workflow call_variants {
       sample_name = sample_name,
   }
 
-  # check coverage
-  call mosdepth.run_mosdepth {
-    input:
-      bams = run_pbmm2.bams,
-      bais = run_pbmm2.bais,
-  }
-
   # check sample swaps
   call somalier.run_somalier {
     input:
@@ -69,6 +62,13 @@ workflow call_variants {
       reference_fasta = reference_fasta,
       reference_index = reference_index,
       sites_vcf = sites_vcf
+  }
+
+  # check coverage
+  call mosdepth.run_mosdepth {
+    input:
+      bams = run_pbmm2.bams,
+      bais = run_pbmm2.bais,
   }
 
   # run pbsv 
@@ -170,6 +170,7 @@ workflow call_variants {
     Float mosdepth_total_coverage = run_mosdepth.total_coverage
     File somalier_pairs = run_somalier.pairs
     Float somalier_min_relatedness = run_somalier.min_relatedness
+    Float somalier_inferred_sex = run_somalier.inferred_sex
     File pbsv_vcf = run_pbsv.vcf
     File deepvariant_vcf = run_deepvariant.vcf
     File deepvariant_index = run_deepvariant.index

@@ -66,7 +66,7 @@ task mosdepth {
   command <<<
     set -o pipefail
     mosdepth --threads ~{threads} "--no-per-base" ~{output_prefix} ~{bam}
-    awk '$1=="total_region" { print $4 }' ~{output_prefix}.mosdepth.summary.txt > mean_coverage.txt
+    awk '$1=="total" { print $4 }' ~{output_prefix}.mosdepth.summary.txt > mean_coverage.txt
   >>>
 
   output {

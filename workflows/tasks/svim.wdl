@@ -1,6 +1,6 @@
 version 1.0
 
-import "common.wdl" as common
+import "utils.wdl" as utils
 
 workflow run_svim {
   meta {
@@ -40,7 +40,7 @@ workflow run_svim {
   }
 
   # sort VCF
-  call common.sort_vcf {
+  call utils.sort_vcf {
     input:
       input_vcf = svim_alignment.vcf,
       output_filename = "~{sample_name}.~{reference_name}.svim.vcf"

@@ -1,6 +1,6 @@
 version 1.0
 
-import "common.wdl" as common
+import "utils.wdl" as utils
 
 workflow run_hifiasm {
   meta {
@@ -37,13 +37,13 @@ workflow run_hifiasm {
   }
 
   # zip hap1 fasta
-  call common.bgzip_fasta as bgzip_hap1 {
+  call utils.bgzip_fasta as bgzip_hap1 {
     input:
       fasta = gfa2fa_hap1.fasta,
   }
 
   # zip hap2 fasta
-  call common.bgzip_fasta as bgzip_hap2 {
+  call utils.bgzip_fasta as bgzip_hap2 {
     input:
       fasta = gfa2fa_hap2.fasta,
   }

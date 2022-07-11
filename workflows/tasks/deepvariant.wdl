@@ -58,7 +58,6 @@ task deepvariant {
     reference_name: { help: "Name of the the reference genome, used for file labeling." }
     reference_fasta: { help: "Path to the reference genome FASTA file." }
     reference_index: { help: "Path to the reference genome FAI index file." }
-    output_vcf: { help: "Filename for the output VCF file." }
     threads: { help: "Number of threads to be used." }
 
     # outputs
@@ -73,10 +72,10 @@ task deepvariant {
     String reference_name
     File reference_fasta
     File reference_index
-    String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
     Int threads = 64
   }
   
+  String output_vcf = "~{sample_name}.~{reference_name}.deepvariant.vcf.gz"
   Int memory = 4 * threads
   Int disk_size = ceil(3.25 * (size(reference_fasta, "GB") + size(bams, "GB"))) + 20
 

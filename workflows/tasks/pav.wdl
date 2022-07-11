@@ -1,6 +1,6 @@
 version 1.0
 
-import "common.wdl" as common
+import "utils.wdl" as utils
 
 workflow run_pav {
   meta {
@@ -39,7 +39,7 @@ workflow run_pav {
       reference_index = reference_index,
   }
   
-  call common.unzip_vcf {
+  call utils.unzip_vcf {
     input: 
       input_vcf = pav.vcf
   }

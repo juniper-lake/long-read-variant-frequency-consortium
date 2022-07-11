@@ -1,6 +1,6 @@
 version 1.0
 
-import "common.wdl" as common
+import "utils.wdl" as utils
 
 workflow run_pbsv {
   meta {
@@ -56,7 +56,7 @@ workflow run_pbsv {
     }
     
     # zip and index region-specific VCFs
-    call common.zip_and_index_vcf {
+    call utils.zip_and_index_vcf {
       input: 
         input_vcf = pbsv_call_by_region.vcf,
     }

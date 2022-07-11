@@ -1,6 +1,6 @@
 version 1.0
 
-import "common.wdl" as common
+import "utils.wdl" as utils
 
 workflow convert_to_fasta {
   meta {
@@ -33,7 +33,7 @@ workflow convert_to_fasta {
           movie = movies[idx],
       }
 
-      call common.bgzip_fasta {
+      call utils.bgzip_fasta {
         input:
           fasta = ubam_to_fasta.fasta
       }

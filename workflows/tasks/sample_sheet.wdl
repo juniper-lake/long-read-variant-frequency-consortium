@@ -1,7 +1,5 @@
 version 1.0
 
-import "common.wdl" as common
-
 workflow read_sample_sheet {
   meta {
     description: "Get all movies and movie info for a sample."

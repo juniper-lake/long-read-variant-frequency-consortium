@@ -90,7 +90,7 @@ task merge_callers {
       file_list=vcf_fofn \
       bam_list=bam_fofn \
       genome_file=~{reference_fasta} \
-      out_file= ~{output_vcf} \
+      out_file=~{output_vcf} \
       min_support=2 \
       max_dist=200 \
       --run_iris \
@@ -160,7 +160,7 @@ task merge_samples {
       file_list=vcf_fofn \
       bam_list=bam_fofn \
       genome_file=~{reference_fasta} \
-      out_file= ~{output_vcf} \
+      out_file=~{output_vcf} \
       --output_genotypes \
       --dup_to_ins \
   >>>

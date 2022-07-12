@@ -1,7 +1,7 @@
 {
-  "call_variants.regions": "Array[String]",
+  "call_variants.chromosomes": "Array[String]",
   "call_variants.reference_fasta": "File",
-  "call_variants.hifi_reads": "Array[File]",
+  "call_variants.sample_sheet": "File",
   "call_variants.reference_index": "File",
   "call_variants.sites_vcf": "File",
   "call_variants.sample_name": "String",

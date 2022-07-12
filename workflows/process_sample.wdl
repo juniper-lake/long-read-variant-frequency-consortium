@@ -30,7 +30,7 @@ workflow call_variants {
     reference_index: { help: "Path to the reference genome FAI index file." }
     tr_bed: { help: "BED file containing known tandem repeats for reference genome." }
     sites_vcf: { help: "List of known polymorphic sites provided by somalier." }
-    regions: { help: "Array of regions to call variants in, used for parallel processing of genome." }
+    chromosomes: { help: "Array of chromosomes to call variants in, used for parallel processing of genome." }
     min_relatedness_sample_swap: { help: "Minimum pairwise relatedness among all movies for sample to pass quality control." }
     min_coverage_assembly: { help: "Minimum average coverage across genome for reads to be assembled." }
   }
@@ -41,7 +41,7 @@ workflow call_variants {
     String reference_name
     File reference_fasta
     File reference_index
-    Array[String] regions
+    Array[String] chromosomes
     File tr_bed
     File sites_vcf
     Float min_relatedness_sample_swap = 0.85
@@ -87,7 +87,7 @@ workflow call_variants {
         reference_fasta = reference_fasta,
         reference_index = reference_index,
         tr_bed = tr_bed,
-        regions = regions,
+        regions = chromosomes,
     }
 
     # run deepvariant

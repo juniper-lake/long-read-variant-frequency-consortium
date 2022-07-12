@@ -46,7 +46,9 @@ workflow run_pav {
   }
 
   output {
-    File vcf = filter_pav.vcf
+    File filtered_vcf = filter_pav.vcf
+    File unfiltered_vcf = pav.vcf
+    File unfiltered_index = pav.index
   }
 }
 

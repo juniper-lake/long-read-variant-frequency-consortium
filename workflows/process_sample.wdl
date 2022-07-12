@@ -181,7 +181,7 @@ workflow call_variants {
       call jasmine.run_jasmine as merge_callers_with_pav {
         input:
           sample_name = sample_name,
-          vcfs = [run_cutesv.vcf,run_pav.vcf,run_pbsv.vcf,run_sniffles.vcf,run_svim.vcf],
+          vcfs = [run_cutesv.vcf,run_pav.filtered_vcf,run_pbsv.vcf,run_sniffles.vcf,run_svim.vcf],
           bams = [run_minimap2.bam],
           bais = [run_minimap2.bai],
           reference_fasta = reference_fasta,
@@ -207,6 +207,7 @@ workflow call_variants {
   }
 
   output {
+    Array[File] hifi_reads = read_sample_sheet.movie_paths
     Array[File] pbmm2_bams = run_pbmm2.bams
     Array[File] pbmm2_bais = run_pbmm2.bais
     File somalier_pairs = run_somalier.pairs
@@ -223,7 +224,9 @@ workflow call_variants {
     File? cutesv_vcf = run_cutesv.vcf
     File? hifiasm_hap1_fasta = run_hifiasm.hap1_fasta
     File? hifiasm_hap2_fasta = run_hifiasm.hap2_fasta
-    File? pav_vcf = run_pav.vcf
+    File? pav_filtered_vcf = run_pav.filtered_vcf
+    File? pav_vcf = run_pav.unfiltered_vcf
+    File? pav_index = run_pav.unfiltered_index
     File? jasmine_vcf = select_first([merge_callers_with_pav.vcf,merge_callers_no_pav.vcf])
   }
 }

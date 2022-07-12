@@ -81,7 +81,7 @@ task pav {
   }
 
   String output_infix = "~{sample_name}_~{reference_name}"
-  Int memory = 2 * threads
+  Int memory = 4 * threads
   Int disk_size = ceil(3.25 * (size(hap1_fasta, "GB") + size(hap2_fasta, "GB") + size(reference_fasta, "GB"))) + 20
   
   command<<<

@@ -68,7 +68,6 @@ task unzip_vcf {
   command {
     set -o pipefail
     bgzip -d -c ~{input_vcf} > ~{output_filename}
-    tabix --preset vcf ~{output_filename}
   }
 
   output {
